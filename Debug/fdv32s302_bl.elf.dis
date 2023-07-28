@@ -1,0 +1,2238 @@
+
+fdv32s302_bl.elf:     file format elf32-littleriscv
+
+
+Disassembly of section .init:
+
+10100000 <_start>:
+	.globl _start
+	.type _start,@function
+/* set all registers to zero */
+
+_start:
+	csrrci x0, mstatus, 0x8  //Disable the interrupt globally
+10100000:	30047073          	csrci	mstatus,8
+.option push
+.option norelax
+	la gp, __global_pointer$
+10100004:	0ff00197          	auipc	gp,0xff00
+10100008:	45c18193          	addi	gp,gp,1116 # 20000460 <__global_pointer$>
+.option pop
+	la sp, _sp
+1010000c:	0ff01117          	auipc	sp,0xff01
+10100010:	ff410113          	addi	sp,sp,-12 # 20001000 <_sp>
+
+    #csrrsi x0, 0xbfe, 0x8 // Disable I-Cache
+2:
+	/* Load data section */
+	la a0, _data_lma
+10100014:	00001517          	auipc	a0,0x1
+10100018:	f2050513          	addi	a0,a0,-224 # 10100f34 <_data_lma>
+	la a1, _data
+1010001c:	ba018593          	addi	a1,gp,-1120 # 20000000 <_data>
+	la a2, _edata
+10100020:	c0818613          	addi	a2,gp,-1016 # 20000068 <__bss_start>
+	bgeu a1, a2, 2f
+10100024:	00c5fa63          	bgeu	a1,a2,10100038 <_start+0x38>
+1:
+	lw t0, (a0)
+10100028:	00052283          	lw	t0,0(a0)
+	sw t0, (a1)
+1010002c:	0055a023          	sw	t0,0(a1)
+	addi a0, a0, 4
+10100030:	0511                	addi	a0,a0,4
+	addi a1, a1, 4
+10100032:	0591                	addi	a1,a1,4
+	bltu a1, a2, 1b
+10100034:	fec5eae3          	bltu	a1,a2,10100028 <_start+0x28>
+2:
+	/* Clear bss section */
+	la a0, __bss_start
+10100038:	c0818513          	addi	a0,gp,-1016 # 20000068 <__bss_start>
+	la a1, _end
+1010003c:	d0818593          	addi	a1,gp,-760 # 20000168 <_end>
+	bgeu a0, a1, 2f
+10100040:	00b57763          	bgeu	a0,a1,1010004e <_start+0x4e>
+1:
+	sw zero, (a0)
+10100044:	00052023          	sw	zero,0(a0)
+	addi a0, a0, 4
+10100048:	0511                	addi	a0,a0,4
+	bltu a0, a1, 1b
+1010004a:	feb56de3          	bltu	a0,a1,10100044 <_start+0x44>
+2:
+
+	call SystemInit
+1010004e:	3df000ef          	jal	ra,10100c2c <SystemInit>
+	csrs mstatus, t0
+	csrw fcsr, x0
+#endif
+
+	/* argc = argv = 0 */
+	li a0, 0
+10100052:	4501                	li	a0,0
+	li a1, 0
+10100054:	4581                	li	a1,0
+	call main
+10100056:	2029                	jal	10100060 <main>
+	tail exit
+10100058:	4c10006f          	j	10100d18 <exit>
+
+1:
+	j 1b
+1010005c:	a001                	j	1010005c <_start+0x5c>
+
+Disassembly of section .text:
+
+10100060 <main>:
+	(void)arg;
+	(void)sp;
+}
+
+int main(void)
+{
+10100060:	1141                	addi	sp,sp,-16
+10100062:	c606                	sw	ra,12(sp)
+10100064:	c422                	sw	s0,8(sp)
+10100066:	c226                	sw	s1,4(sp)
+	uint8_t c;
+
+	TIM_ClkInit();
+10100068:	1a9000ef          	jal	ra,10100a10 <TIM_ClkInit>
+	UART_HalInit();
+1010006c:	23b000ef          	jal	ra,10100aa6 <UART_HalInit>
+	FLASH_HalInit();
+10100070:	281000ef          	jal	ra,10100af0 <FLASH_HalInit>
+
+	/* config the mcuboot */
+	mcuboot.op_send = mcuboot_send;
+10100074:	00001797          	auipc	a5,0x1
+10100078:	89678793          	addi	a5,a5,-1898 # 1010090a <mcuboot_send>
+1010007c:	caf1aa23          	sw	a5,-844(gp) # 20000114 <mcuboot+0xa0>
+	mcuboot.op_reset = mcuboot_reset;
+10100080:	00001797          	auipc	a5,0x1
+10100084:	9f878793          	addi	a5,a5,-1544 # 10100a78 <mcuboot_reset>
+10100088:	cef1a423          	sw	a5,-792(gp) # 20000148 <mcuboot+0xd4>
+	mcuboot.op_jump = mcuboot_jump;
+1010008c:	00001797          	auipc	a5,0x1
+10100090:	8f678793          	addi	a5,a5,-1802 # 10100982 <mcuboot_jump>
+10100094:	cef1a623          	sw	a5,-788(gp) # 2000014c <mcuboot+0xd8>
+	mcuboot.op_complete = mcuboot_complete;
+10100098:	00001797          	auipc	a5,0x1
+1010009c:	89678793          	addi	a5,a5,-1898 # 1010092e <mcuboot_complete>
+101000a0:	cef1a823          	sw	a5,-784(gp) # 20000150 <mcuboot+0xdc>
+
+	mcuboot.op_mem_erase = memory_erase;
+101000a4:	00001797          	auipc	a5,0x1
+101000a8:	93e78793          	addi	a5,a5,-1730 # 101009e2 <memory_erase>
+101000ac:	cef1a023          	sw	a5,-800(gp) # 20000140 <mcuboot+0xcc>
+	mcuboot.op_mem_write = memory_write;
+101000b0:	00001797          	auipc	a5,0x1
+101000b4:	8f678793          	addi	a5,a5,-1802 # 101009a6 <memory_write>
+101000b8:	ccf1ae23          	sw	a5,-804(gp) # 2000013c <mcuboot+0xc8>
+	mcuboot.op_mem_read = memory_read;
+101000bc:	00001797          	auipc	a5,0x1
+101000c0:	8d678793          	addi	a5,a5,-1834 # 10100992 <memory_read>
+101000c4:	cef1a223          	sw	a5,-796(gp) # 20000144 <mcuboot+0xd0>
+
+	mcuboot.cfg_flash_start = APPLICATION_BASE; 
+101000c8:	101017b7          	lui	a5,0x10101
+101000cc:	caf1ac23          	sw	a5,-840(gp) # 20000118 <mcuboot+0xa4>
+	mcuboot.cfg_flash_size = TARGET_FLASH_SIZE;
+101000d0:	679d                	lui	a5,0x7
+101000d2:	caf1ae23          	sw	a5,-836(gp) # 2000011c <mcuboot+0xa8>
+	mcuboot.cfg_flash_sector_size = 512;
+101000d6:	20000793          	li	a5,512
+101000da:	ccf1a023          	sw	a5,-832(gp) # 20000120 <mcuboot+0xac>
+	mcuboot.cfg_ram_start = 0x20000000;
+101000de:	200007b7          	lui	a5,0x20000
+101000e2:	ccf1a223          	sw	a5,-828(gp) # 20000124 <mcuboot+0xb0>
+	mcuboot.cfg_ram_size = 4*1024;
+101000e6:	6785                	lui	a5,0x1
+101000e8:	ccf1a423          	sw	a5,-824(gp) # 20000128 <mcuboot+0xb4>
+	mcuboot.cfg_device_id = 0x12345678;
+101000ec:	123457b7          	lui	a5,0x12345
+101000f0:	67878793          	addi	a5,a5,1656 # 12345678 <_data_lma+0x2244744>
+101000f4:	ccf1a623          	sw	a5,-820(gp) # 2000012c <mcuboot+0xb8>
+	mcuboot.cfg_uuid = 0x87654321;
+101000f8:	876547b7          	lui	a5,0x87654
+101000fc:	32178793          	addi	a5,a5,801 # 87654321 <_sp+0x67653321>
+10100100:	ccf1a823          	sw	a5,-816(gp) # 20000130 <mcuboot+0xbc>
+
+	if(REG32(0x10140080) == 0x0FFAF005)
+10100104:	101407b7          	lui	a5,0x10140
+10100108:	0807a783          	lw	a5,128(a5) # 10140080 <_data_lma+0x3f14c>
+1010010c:	f0051737          	lui	a4,0xf0051
+10100110:	176d                	addi	a4,a4,-5
+10100112:	97ba                	add	a5,a5,a4
+10100114:	0017b793          	seqz	a5,a5
+		mcuboot.flash_encrypt = 1;
+	else
+		mcuboot.flash_encrypt = 0;
+	mcuboot.encrypt_erase = 0;
+
+	mcuboot_init(&mcuboot);
+10100118:	c1418513          	addi	a0,gp,-1004 # 20000074 <mcuboot>
+1010011c:	ccf1aa23          	sw	a5,-812(gp) # 20000134 <mcuboot+0xc0>
+	mcuboot.encrypt_erase = 0;
+10100120:	cc01ac23          	sw	zero,-808(gp) # 20000138 <mcuboot+0xc4>
+	mcuboot_init(&mcuboot);
+10100124:	26e5                	jal	1010050c <mcuboot_init>
+//	printf("EFC->TERS: 0x%08x\n", EFC->TERS);
+
+	printf("fdv32s302 boot loader start!!!\r\n");
+	while (1)
+	{
+		if(UARTx->ISR & UART_FLAG_RI)
+10100126:	c0018413          	addi	s0,gp,-1024 # 20000060 <UARTx>
+1010012a:	401c                	lw	a5,0(s0)
+1010012c:	4b98                	lw	a4,16(a5)
+1010012e:	8b09                	andi	a4,a4,2
+10100130:	cf01                	beqz	a4,10100148 <main+0xe8>
+		{
+			UARTx->ISR = UART_FLAG_RI;
+10100132:	4709                	li	a4,2
+10100134:	cb98                	sw	a4,16(a5)
+			c = (u8)(UARTx->SBUF);
+10100136:	43dc                	lw	a5,4(a5)
+			mcuboot_recv(&mcuboot, &c, 1);
+10100138:	4605                	li	a2,1
+1010013a:	00310593          	addi	a1,sp,3
+1010013e:	c1418513          	addi	a0,gp,-1004 # 20000074 <mcuboot>
+			c = (u8)(UARTx->SBUF);
+10100142:	00f101a3          	sb	a5,3(sp)
+			mcuboot_recv(&mcuboot, &c, 1);
+10100146:	2e59                	jal	101004dc <mcuboot_recv>
+		}
+
+		if(timeout_jump == 1)
+10100148:	c101c703          	lbu	a4,-1008(gp) # 20000070 <timeout_jump>
+1010014c:	4785                	li	a5,1
+1010014e:	00f71863          	bne	a4,a5,1010015e <main+0xfe>
+        Jump_to_APP(addr);
+10100152:	10101537          	lui	a0,0x10101
+10100156:	7da000ef          	jal	ra,10100930 <Jump_to_APP>
+		{
+			mcuboot_jump(APPLICATION_BASE, 0, 0);
+			timeout_jump = 0;
+1010015a:	c0018823          	sb	zero,-1008(gp) # 20000070 <timeout_jump>
+		}
+		mcuboot_proc(&mcuboot);
+1010015e:	c1418493          	addi	s1,gp,-1004 # 20000074 <mcuboot>
+10100162:	8526                	mv	a0,s1
+10100164:	203d                	jal	10100192 <mcuboot_proc>
+
+		if(!mcuboot.is_connected)			// 未连接上切换串口试探
+10100166:	0ec4a783          	lw	a5,236(s1)
+1010016a:	ffd5                	bnez	a5,10100126 <main+0xc6>
+		{
+			UARTx = (UARTx == UART1) ? UART2 : UART1;		// 切换串口试探
+1010016c:	4018                	lw	a4,0(s0)
+1010016e:	400116b7          	lui	a3,0x40011
+10100172:	c0070793          	addi	a5,a4,-1024 # f0050c00 <_sp+0xd004fc00>
+10100176:	00d70463          	beq	a4,a3,1010017e <main+0x11e>
+1010017a:	400117b7          	lui	a5,0x40011
+1010017e:	c0f1a023          	sw	a5,-1024(gp) # 20000060 <UARTx>
+10100182:	b755                	j	10100126 <main+0xc6>
+
+10100184 <dec_cb>:
+    }
+}
+
+static void dec_cb(frame_packet_t *rx)
+{
+    evt = 1;
+10100184:	4785                	li	a5,1
+10100186:	c0f1a423          	sw	a5,-1016(gp) # 20000068 <__bss_start>
+	(void)rx;
+}
+1010018a:	8082                	ret
+
+1010018c <mcuboot_is_connected>:
+
+uint32_t mcuboot_is_connected(mcuboot_t *ctx)
+{
+    return ctx->is_connected;
+}
+1010018c:	0ec52503          	lw	a0,236(a0) # 101010ec <_data_lma+0x1b8>
+10100190:	8082                	ret
+
+10100192 <mcuboot_proc>:
+
+void mcuboot_proc(mcuboot_t *ctx)
+{
+    if(evt)
+10100192:	c0818793          	addi	a5,gp,-1016 # 20000068 <__bss_start>
+10100196:	439c                	lw	a5,0(a5)
+10100198:	34078163          	beqz	a5,101004da <mcuboot_proc+0x348>
+{
+1010019c:	fac10113          	addi	sp,sp,-84
+101001a0:	c6a2                	sw	s0,76(sp)
+101001a2:	c886                	sw	ra,80(sp)
+101001a4:	c4a6                	sw	s1,72(sp)
+    {
+        ctx->is_connected = 1;
+101001a6:	4785                	li	a5,1
+101001a8:	0ef52623          	sw	a5,236(a0)
+        switch(ctx->rx_pkt.hr.packet_type)
+101001ac:	00354783          	lbu	a5,3(a0)
+101001b0:	0a500713          	li	a4,165
+101001b4:	842a                	mv	s0,a0
+101001b6:	2ae78d63          	beq	a5,a4,10100470 <mcuboot_proc+0x2de>
+101001ba:	0a600713          	li	a4,166
+101001be:	04e78e63          	beq	a5,a4,1010021a <mcuboot_proc+0x88>
+101001c2:	0a400713          	li	a4,164
+101001c6:	06e79663          	bne	a5,a4,10100232 <mcuboot_proc+0xa0>
+    memcpy(&rx_cp, pkt->payload, 4);
+101001ca:	00850593          	addi	a1,a0,8
+101001ce:	4611                	li	a2,4
+101001d0:	0028                	addi	a0,sp,8
+101001d2:	377000ef          	jal	ra,10100d48 <memcpy>
+    memcpy(rx_param, &pkt->payload[4], rx_cp.param_cnt*sizeof(uint32_t));
+101001d6:	00b14603          	lbu	a2,11(sp)
+101001da:	107c                	addi	a5,sp,44
+101001dc:	00c40593          	addi	a1,s0,12
+101001e0:	060a                	slli	a2,a2,0x2
+101001e2:	853e                	mv	a0,a5
+101001e4:	365000ef          	jal	ra,10100d48 <memcpy>
+    rx_cp.param = rx_param;
+101001e8:	c62a                	sw	a0,12(sp)
+    kptl_create_ack(&ack);
+101001ea:	0048                	addi	a0,sp,4
+101001ec:	2e41                	jal	1010057c <kptl_create_ack>
+    ctx->op_send((uint8_t*)&ack, sizeof(ack));
+101001ee:	0a042783          	lw	a5,160(s0)
+101001f2:	4589                	li	a1,2
+101001f4:	0048                	addi	a0,sp,4
+101001f6:	9782                	jalr	a5
+    switch(rx_cp.tag)
+101001f8:	00814783          	lbu	a5,8(sp)
+101001fc:	472d                	li	a4,11
+101001fe:	17fd                	addi	a5,a5,-1
+10100200:	0ff7f793          	andi	a5,a5,255
+10100204:	02f76763          	bltu	a4,a5,10100232 <mcuboot_proc+0xa0>
+10100208:	00001717          	auipc	a4,0x1
+1010020c:	cc070713          	addi	a4,a4,-832 # 10100ec8 <memset+0xa8>
+10100210:	078a                	slli	a5,a5,0x2
+10100212:	97ba                	add	a5,a5,a4
+10100214:	439c                	lw	a5,0(a5)
+10100216:	97ba                	add	a5,a5,a4
+10100218:	8782                	jr	a5
+        {
+            case kFramingPacketType_Ping:
+            {
+                ping_resp_packet_t pr;
+                kptl_create_ping_resp_packet(&pr, 1, 2, 0, 0, 0);
+1010021a:	4781                	li	a5,0
+1010021c:	4585                	li	a1,1
+1010021e:	1068                	addi	a0,sp,44
+10100220:	4701                	li	a4,0
+10100222:	4681                	li	a3,0
+10100224:	4609                	li	a2,2
+10100226:	26a5                	jal	1010058e <kptl_create_ping_resp_packet>
+                ctx->op_send((uint8_t*)&pr, sizeof(ping_resp_packet_t));
+10100228:	0a042783          	lw	a5,160(s0)
+1010022c:	45a9                	li	a1,10
+1010022e:	1068                	addi	a0,sp,44
+10100230:	9782                	jalr	a5
+            default:
+                break;
+        }
+        evt = 0;
+    }
+}
+10100232:	40c6                	lw	ra,80(sp)
+10100234:	4436                	lw	s0,76(sp)
+        evt = 0;
+10100236:	c001a423          	sw	zero,-1016(gp) # 20000068 <__bss_start>
+}
+1010023a:	44a6                	lw	s1,72(sp)
+1010023c:	05410113          	addi	sp,sp,84
+10100240:	8082                	ret
+            switch(rx_cp.param[0])
+10100242:	57b2                	lw	a5,44(sp)
+            tx_param[0] = 0x00000000;
+10100244:	c802                	sw	zero,16(sp)
+            switch(rx_cp.param[0])
+10100246:	472d                	li	a4,11
+10100248:	0ae78e63          	beq	a5,a4,10100304 <mcuboot_proc+0x172>
+1010024c:	04f76863          	bltu	a4,a5,1010029c <mcuboot_proc+0x10a>
+10100250:	4711                	li	a4,4
+10100252:	0ae78363          	beq	a5,a4,101002f8 <mcuboot_proc+0x166>
+10100256:	02f76863          	bltu	a4,a5,10100286 <mcuboot_proc+0xf4>
+1010025a:	4709                	li	a4,2
+1010025c:	08e78963          	beq	a5,a4,101002ee <mcuboot_proc+0x15c>
+10100260:	08f76963          	bltu	a4,a5,101002f2 <mcuboot_proc+0x160>
+10100264:	4705                	li	a4,1
+10100266:	06e78e63          	beq	a5,a4,101002e2 <mcuboot_proc+0x150>
+    uint8_t tx_param_cnt = 0;
+1010026a:	4581                	li	a1,0
+            kptl_create_property_resp_packet(&ctx->tx_pkt, tx_param_cnt, tx_param);
+1010026c:	04a40493          	addi	s1,s0,74
+10100270:	0810                	addi	a2,sp,16
+10100272:	8526                	mv	a0,s1
+10100274:	2165                	jal	1010071c <kptl_create_property_resp_packet>
+            ctx->op_send((uint8_t*)&ctx->tx_pkt, kptl_frame_packet_get_size(&ctx->tx_pkt));
+10100276:	0a042403          	lw	s0,160(s0)
+1010027a:	8526                	mv	a0,s1
+1010027c:	21c1                	jal	1010073c <kptl_frame_packet_get_size>
+1010027e:	85aa                	mv	a1,a0
+10100280:	8526                	mv	a0,s1
+10100282:	9402                	jalr	s0
+            break;
+10100284:	b77d                	j	10100232 <mcuboot_proc+0xa0>
+10100286:	4719                	li	a4,6
+10100288:	06e78363          	beq	a5,a4,101002ee <mcuboot_proc+0x15c>
+1010028c:	06e7e963          	bltu	a5,a4,101002fe <mcuboot_proc+0x16c>
+10100290:	471d                	li	a4,7
+10100292:	fce79ce3          	bne	a5,a4,1010026a <mcuboot_proc+0xd8>
+                    tx_param[1] =  0xFFFF;
+10100296:	67c1                	lui	a5,0x10
+10100298:	17fd                	addi	a5,a5,-1
+1010029a:	a881                	j	101002ea <mcuboot_proc+0x158>
+1010029c:	4741                	li	a4,16
+1010029e:	06e78c63          	beq	a5,a4,10100316 <mcuboot_proc+0x184>
+101002a2:	02f76063          	bltu	a4,a5,101002c2 <mcuboot_proc+0x130>
+101002a6:	4739                	li	a4,14
+101002a8:	06e78163          	beq	a5,a4,1010030a <mcuboot_proc+0x178>
+101002ac:	06f76263          	bltu	a4,a5,10100310 <mcuboot_proc+0x17e>
+101002b0:	4731                	li	a4,12
+101002b2:	fae79ce3          	bne	a5,a4,1010026a <mcuboot_proc+0xd8>
+                    tx_param[1] = 0;
+101002b6:	ca02                	sw	zero,20(sp)
+                    tx_param[2] = 0;
+101002b8:	cc02                	sw	zero,24(sp)
+                    tx_param[3] = 0;
+101002ba:	ce02                	sw	zero,28(sp)
+                    tx_param[4] = 0;
+101002bc:	d002                	sw	zero,32(sp)
+                    tx_param_cnt = 5;
+101002be:	4595                	li	a1,5
+101002c0:	b775                	j	1010026c <mcuboot_proc+0xda>
+101002c2:	4749                	li	a4,18
+101002c4:	04e78f63          	beq	a5,a4,10100322 <mcuboot_proc+0x190>
+101002c8:	04e7ea63          	bltu	a5,a4,1010031c <mcuboot_proc+0x18a>
+101002cc:	0e000713          	li	a4,224
+101002d0:	04e78c63          	beq	a5,a4,10100328 <mcuboot_proc+0x196>
+101002d4:	0e100713          	li	a4,225
+101002d8:	f8e799e3          	bne	a5,a4,1010026a <mcuboot_proc+0xd8>
+                    tx_param[1] = ctx->flash_encrypt;
+101002dc:	0c042783          	lw	a5,192(s0)
+101002e0:	a029                	j	101002ea <mcuboot_proc+0x158>
+                    tx_param[1] = 0x4b010500;
+101002e2:	4b0107b7          	lui	a5,0x4b010
+101002e6:	50078793          	addi	a5,a5,1280 # 4b010500 <_sp+0x2b00f500>
+                    tx_param[1] = ctx->flash_encrypt;
+101002ea:	ca3e                	sw	a5,20(sp)
+101002ec:	a80d                	j	1010031e <mcuboot_proc+0x18c>
+                    tx_param[1] = 0x00000001;
+101002ee:	4785                	li	a5,1
+101002f0:	bfed                	j	101002ea <mcuboot_proc+0x158>
+                    tx_param[1] = ctx->cfg_flash_start;
+101002f2:	0a442783          	lw	a5,164(s0)
+101002f6:	bfd5                	j	101002ea <mcuboot_proc+0x158>
+                    tx_param[1] = ctx->cfg_flash_size;
+101002f8:	0a842783          	lw	a5,168(s0)
+101002fc:	b7fd                	j	101002ea <mcuboot_proc+0x158>
+                    tx_param[1] = ctx->cfg_flash_sector_size;
+101002fe:	0ac42783          	lw	a5,172(s0)
+10100302:	b7e5                	j	101002ea <mcuboot_proc+0x158>
+					tx_param[1] = MAX_PACKET_LEN<512?MAX_PACKET_LEN:512;
+10100304:	04000793          	li	a5,64
+10100308:	b7cd                	j	101002ea <mcuboot_proc+0x158>
+                    tx_param[1] = ctx->cfg_ram_start;
+1010030a:	0b042783          	lw	a5,176(s0)
+1010030e:	bff1                	j	101002ea <mcuboot_proc+0x158>
+                    tx_param[1] = ctx->cfg_ram_size;
+10100310:	0b442783          	lw	a5,180(s0)
+10100314:	bfd9                	j	101002ea <mcuboot_proc+0x158>
+                    tx_param[1] = ctx->cfg_device_id;
+10100316:	0b842783          	lw	a5,184(s0)
+1010031a:	bfc1                	j	101002ea <mcuboot_proc+0x158>
+                    tx_param[1] = 0;
+1010031c:	ca02                	sw	zero,20(sp)
+                    tx_param_cnt = 2;
+1010031e:	4589                	li	a1,2
+10100320:	b7b1                	j	1010026c <mcuboot_proc+0xda>
+                    tx_param[1] = ctx->cfg_uuid;
+10100322:	0bc42783          	lw	a5,188(s0)
+10100326:	b7d1                	j	101002ea <mcuboot_proc+0x158>
+					for(uint32_t addr = ctx->mem_start_addr; addr < ctx->mem_cur_addr; addr++)
+10100328:	0e042703          	lw	a4,224(s0)
+1010032c:	0e842683          	lw	a3,232(s0)
+					uint8_t check_sum = 0;
+10100330:	4781                	li	a5,0
+					for(uint32_t addr = ctx->mem_start_addr; addr < ctx->mem_cur_addr; addr++)
+10100332:	fad77ce3          	bgeu	a4,a3,101002ea <mcuboot_proc+0x158>
+						check_sum += (*(uint8_t *)(addr));
+10100336:	00074603          	lbu	a2,0(a4)
+					for(uint32_t addr = ctx->mem_start_addr; addr < ctx->mem_cur_addr; addr++)
+1010033a:	0705                	addi	a4,a4,1
+						check_sum += (*(uint8_t *)(addr));
+1010033c:	97b2                	add	a5,a5,a2
+1010033e:	0ff7f793          	andi	a5,a5,255
+10100342:	bfc5                	j	10100332 <mcuboot_proc+0x1a0>
+			if(ctx->flash_encrypt && !ctx->encrypt_erase)			// 加密状态操作flash需要擦除应用区
+10100344:	0c042783          	lw	a5,192(s0)
+10100348:	cf89                	beqz	a5,10100362 <mcuboot_proc+0x1d0>
+1010034a:	0c442783          	lw	a5,196(s0)
+1010034e:	eb91                	bnez	a5,10100362 <mcuboot_proc+0x1d0>
+				ctx->op_mem_erase(0x10101000, 0x7000);
+10100350:	0cc42783          	lw	a5,204(s0)
+10100354:	659d                	lui	a1,0x7
+10100356:	10101537          	lui	a0,0x10101
+1010035a:	9782                	jalr	a5
+				ctx->encrypt_erase = 1;
+1010035c:	4785                	li	a5,1
+1010035e:	0cf42223          	sw	a5,196(s0)
+            ctx->mem_start_addr = rx_cp.param[0];
+10100362:	5532                	lw	a0,44(sp)
+            ctx->mem_len = rx_cp.param[1];
+10100364:	55c2                	lw	a1,48(sp)
+            ctx->op_mem_erase(ctx->mem_start_addr, ctx->mem_len);
+10100366:	0cc42783          	lw	a5,204(s0)
+            ctx->mem_start_addr = rx_cp.param[0];
+1010036a:	0ea42023          	sw	a0,224(s0)
+            ctx->mem_len = rx_cp.param[1];
+1010036e:	0eb42223          	sw	a1,228(s0)
+            ctx->op_mem_erase(ctx->mem_start_addr, ctx->mem_len);
+10100372:	9782                	jalr	a5
+            kptl_create_generic_resp_packet(&ctx->tx_pkt, 0, kCommandTag_FlashEraseRegion);
+10100374:	04a40493          	addi	s1,s0,74
+10100378:	4609                	li	a2,2
+1010037a:	4581                	li	a1,0
+1010037c:	8526                	mv	a0,s1
+1010037e:	2ebd                	jal	101006fc <kptl_create_generic_resp_packet>
+10100380:	bddd                	j	10100276 <mcuboot_proc+0xe4>
+            kptl_create_generic_resp_packet(&ctx->tx_pkt, 0, kCommandTag_FlashEraseAll);
+10100382:	04a40493          	addi	s1,s0,74
+10100386:	4605                	li	a2,1
+10100388:	bfcd                	j	1010037a <mcuboot_proc+0x1e8>
+			if(ctx->flash_encrypt && !ctx->encrypt_erase)			// 加密状态操作flash需要擦除应用区
+1010038a:	0c042783          	lw	a5,192(s0)
+1010038e:	cf89                	beqz	a5,101003a8 <mcuboot_proc+0x216>
+10100390:	0c442783          	lw	a5,196(s0)
+10100394:	eb91                	bnez	a5,101003a8 <mcuboot_proc+0x216>
+				ctx->op_mem_erase(0x10101000, 0x7000);
+10100396:	0cc42783          	lw	a5,204(s0)
+1010039a:	659d                	lui	a1,0x7
+1010039c:	10101537          	lui	a0,0x10101
+101003a0:	9782                	jalr	a5
+				ctx->encrypt_erase = 1;
+101003a2:	4785                	li	a5,1
+101003a4:	0cf42223          	sw	a5,196(s0)
+            ctx->mem_start_addr = rx_cp.param[0];
+101003a8:	57b2                	lw	a5,44(sp)
+            ctx->mem_len = rx_cp.param[1];
+101003aa:	5742                	lw	a4,48(sp)
+            kptl_create_generic_resp_packet(&ctx->tx_pkt, 0x00000000, kCommandTag_WriteMemory);
+101003ac:	04a40493          	addi	s1,s0,74
+            ctx->mem_start_addr = rx_cp.param[0];
+101003b0:	0ef42023          	sw	a5,224(s0)
+            ctx->mem_len = rx_cp.param[1];
+101003b4:	0ee42223          	sw	a4,228(s0)
+            ctx->mem_cur_addr = ctx->mem_start_addr;
+101003b8:	0ef42423          	sw	a5,232(s0)
+            kptl_create_generic_resp_packet(&ctx->tx_pkt, 0x00000000, kCommandTag_WriteMemory);
+101003bc:	4611                	li	a2,4
+101003be:	bf75                	j	1010037a <mcuboot_proc+0x1e8>
+            kptl_create_generic_resp_packet(&ctx->tx_pkt, 0x00000000, kCommandTag_Reset);
+101003c0:	04a40493          	addi	s1,s0,74
+101003c4:	462d                	li	a2,11
+101003c6:	4581                	li	a1,0
+101003c8:	8526                	mv	a0,s1
+101003ca:	2e0d                	jal	101006fc <kptl_create_generic_resp_packet>
+            ctx->op_send((uint8_t*)&ctx->tx_pkt, kptl_frame_packet_get_size(&ctx->tx_pkt));
+101003cc:	0a042783          	lw	a5,160(s0)
+101003d0:	8526                	mv	a0,s1
+101003d2:	c03e                	sw	a5,0(sp)
+101003d4:	26a5                	jal	1010073c <kptl_frame_packet_get_size>
+101003d6:	4782                	lw	a5,0(sp)
+101003d8:	85aa                	mv	a1,a0
+101003da:	8526                	mv	a0,s1
+101003dc:	9782                	jalr	a5
+            ctx->op_reset();
+101003de:	0d442783          	lw	a5,212(s0)
+                    ctx->op_complete();
+101003e2:	9782                	jalr	a5
+                break;
+101003e4:	b5b9                	j	10100232 <mcuboot_proc+0xa0>
+            kptl_create_generic_resp_packet(&ctx->tx_pkt, 0x00000000, kCommandTag_Execute);
+101003e6:	04a40493          	addi	s1,s0,74
+101003ea:	4625                	li	a2,9
+101003ec:	4581                	li	a1,0
+101003ee:	8526                	mv	a0,s1
+101003f0:	2631                	jal	101006fc <kptl_create_generic_resp_packet>
+            ctx->op_send((uint8_t*)&ctx->tx_pkt, kptl_frame_packet_get_size(&ctx->tx_pkt));
+101003f2:	0a042783          	lw	a5,160(s0)
+101003f6:	8526                	mv	a0,s1
+101003f8:	c03e                	sw	a5,0(sp)
+101003fa:	2689                	jal	1010073c <kptl_frame_packet_get_size>
+101003fc:	4782                	lw	a5,0(sp)
+101003fe:	85aa                	mv	a1,a0
+10100400:	8526                	mv	a0,s1
+10100402:	9782                	jalr	a5
+            ctx->op_jump(addr, arg, sp);
+10100404:	0d842783          	lw	a5,216(s0)
+10100408:	5652                	lw	a2,52(sp)
+1010040a:	55c2                	lw	a1,48(sp)
+1010040c:	5532                	lw	a0,44(sp)
+1010040e:	9782                	jalr	a5
+            break;
+10100410:	b50d                	j	10100232 <mcuboot_proc+0xa0>
+            switch(rx_cp.param[0])
+10100412:	5732                	lw	a4,44(sp)
+10100414:	0e100793          	li	a5,225
+10100418:	04f71063          	bne	a4,a5,10100458 <mcuboot_proc+0x2c6>
+					if(rx_cp.param[1])
+1010041c:	54c2                	lw	s1,48(sp)
+					uint32_t encrypt_data = 0;
+1010041e:	c802                	sw	zero,16(sp)
+					if(rx_cp.param[1])
+10100420:	0c042783          	lw	a5,192(s0)
+10100424:	cc95                	beqz	s1,10100460 <mcuboot_proc+0x2ce>
+						if(!ctx->flash_encrypt)
+10100426:	e79d                	bnez	a5,10100454 <mcuboot_proc+0x2c2>
+							encrypt_data = 0x0FFAF005;
+10100428:	0ffaf7b7          	lui	a5,0xffaf
+1010042c:	0795                	addi	a5,a5,5
+1010042e:	c83e                	sw	a5,16(sp)
+						ctx->op_mem_erase(0x10140080, 0x80);
+10100430:	0cc42703          	lw	a4,204(s0)
+10100434:	101407b7          	lui	a5,0x10140
+10100438:	08000593          	li	a1,128
+1010043c:	08078513          	addi	a0,a5,128 # 10140080 <_data_lma+0x3f14c>
+10100440:	9702                	jalr	a4
+						ctx->op_mem_write(0x10140080, (uint8_t *)&encrypt_data, 4);
+10100442:	0c842703          	lw	a4,200(s0)
+10100446:	101407b7          	lui	a5,0x10140
+1010044a:	4611                	li	a2,4
+1010044c:	080c                	addi	a1,sp,16
+1010044e:	08078513          	addi	a0,a5,128 # 10140080 <_data_lma+0x3f14c>
+10100452:	9702                	jalr	a4
+                    ctx->flash_encrypt = rx_cp.param[1];
+10100454:	0c942023          	sw	s1,192(s0)
+            kptl_create_generic_resp_packet(&ctx->tx_pkt, 0x00000000, kCommandTag_SetProperty);
+10100458:	04a40493          	addi	s1,s0,74
+1010045c:	4631                	li	a2,12
+1010045e:	bf31                	j	1010037a <mcuboot_proc+0x1e8>
+					else if(ctx->flash_encrypt)			// 解密需要擦除应用区
+10100460:	dbf5                	beqz	a5,10100454 <mcuboot_proc+0x2c2>
+						ctx->op_mem_erase(0x10101000, 0x7000);
+10100462:	0cc42783          	lw	a5,204(s0)
+10100466:	659d                	lui	a1,0x7
+10100468:	10101537          	lui	a0,0x10101
+1010046c:	9782                	jalr	a5
+1010046e:	b7c9                	j	10100430 <mcuboot_proc+0x29e>
+                len = ARRAY2INT16(ctx->rx_pkt.len);
+10100470:	00554483          	lbu	s1,5(a0) # 10101005 <_data_lma+0xd1>
+10100474:	00454783          	lbu	a5,4(a0)
+                ctx->op_mem_write(ctx->mem_cur_addr, ctx->rx_pkt.payload, len);
+10100478:	00850593          	addi	a1,a0,8
+                len = ARRAY2INT16(ctx->rx_pkt.len);
+1010047c:	04a2                	slli	s1,s1,0x8
+1010047e:	94be                	add	s1,s1,a5
+                ctx->op_mem_write(ctx->mem_cur_addr, ctx->rx_pkt.payload, len);
+10100480:	0c852783          	lw	a5,200(a0)
+10100484:	0e852503          	lw	a0,232(a0)
+10100488:	8626                	mv	a2,s1
+1010048a:	9782                	jalr	a5
+                ctx->mem_cur_addr += len;
+1010048c:	0e842783          	lw	a5,232(s0)
+                kptl_create_ack(&ack);
+10100490:	1068                	addi	a0,sp,44
+                ctx->mem_cur_addr += len;
+10100492:	94be                	add	s1,s1,a5
+10100494:	0e942423          	sw	s1,232(s0)
+                kptl_create_ack(&ack);
+10100498:	20d5                	jal	1010057c <kptl_create_ack>
+                ctx->op_send((uint8_t*)&ack, sizeof(ack));
+1010049a:	0a042783          	lw	a5,160(s0)
+1010049e:	4589                	li	a1,2
+101004a0:	1068                	addi	a0,sp,44
+101004a2:	9782                	jalr	a5
+                if(ctx->mem_cur_addr >= (ctx->mem_start_addr + ctx->mem_len))
+101004a4:	0e442703          	lw	a4,228(s0)
+101004a8:	0e042783          	lw	a5,224(s0)
+101004ac:	97ba                	add	a5,a5,a4
+101004ae:	0e842703          	lw	a4,232(s0)
+101004b2:	d8f760e3          	bltu	a4,a5,10100232 <mcuboot_proc+0xa0>
+                    kptl_create_generic_resp_packet(&ctx->tx_pkt, 0x00000000, kCommandTag_WriteMemory);
+101004b6:	04a40493          	addi	s1,s0,74
+101004ba:	4611                	li	a2,4
+101004bc:	4581                	li	a1,0
+101004be:	8526                	mv	a0,s1
+101004c0:	2c35                	jal	101006fc <kptl_create_generic_resp_packet>
+                    ctx->op_send((uint8_t*)&ctx->tx_pkt, kptl_frame_packet_get_size(&ctx->tx_pkt));
+101004c2:	0a042783          	lw	a5,160(s0)
+101004c6:	8526                	mv	a0,s1
+101004c8:	c03e                	sw	a5,0(sp)
+101004ca:	2c8d                	jal	1010073c <kptl_frame_packet_get_size>
+101004cc:	4782                	lw	a5,0(sp)
+101004ce:	85aa                	mv	a1,a0
+101004d0:	8526                	mv	a0,s1
+101004d2:	9782                	jalr	a5
+                    ctx->op_complete();
+101004d4:	0dc42783          	lw	a5,220(s0)
+101004d8:	b729                	j	101003e2 <mcuboot_proc+0x250>
+101004da:	8082                	ret
+
+101004dc <mcuboot_recv>:
+
+void mcuboot_recv(mcuboot_t *ctx, uint8_t *buf, uint32_t len)
+{
+101004dc:	1141                	addi	sp,sp,-16
+101004de:	c422                	sw	s0,8(sp)
+101004e0:	c226                	sw	s1,4(sp)
+101004e2:	c606                	sw	ra,12(sp)
+101004e4:	87aa                	mv	a5,a0
+    uint32_t i;
+    
+    for(i=0; i<len; i++)
+101004e6:	842e                	mv	s0,a1
+101004e8:	00c584b3          	add	s1,a1,a2
+101004ec:	00941763          	bne	s0,s1,101004fa <mcuboot_recv+0x1e>
+    {
+        kptl_decode(&ctx->dec, buf[i]);
+    }
+}
+101004f0:	40b2                	lw	ra,12(sp)
+101004f2:	4422                	lw	s0,8(sp)
+101004f4:	4492                	lw	s1,4(sp)
+101004f6:	0141                	addi	sp,sp,16
+101004f8:	8082                	ret
+        kptl_decode(&ctx->dec, buf[i]);
+101004fa:	00044583          	lbu	a1,0(s0)
+101004fe:	09078513          	addi	a0,a5,144
+10100502:	c03e                	sw	a5,0(sp)
+10100504:	24b5                	jal	10100770 <kptl_decode>
+10100506:	0405                	addi	s0,s0,1
+10100508:	4782                	lw	a5,0(sp)
+1010050a:	b7cd                	j	101004ec <mcuboot_recv+0x10>
+
+1010050c <mcuboot_init>:
+
+void mcuboot_init(mcuboot_t *ctx)
+{
+1010050c:	1151                	addi	sp,sp,-12
+1010050e:	c222                	sw	s0,4(sp)
+10100510:	c406                	sw	ra,8(sp)
+    ctx->dec.fp = &ctx->rx_pkt;
+10100512:	00250793          	addi	a5,a0,2
+10100516:	08f52823          	sw	a5,144(a0)
+    ctx->dec.cb = dec_cb;
+1010051a:	00000797          	auipc	a5,0x0
+1010051e:	c6a78793          	addi	a5,a5,-918 # 10100184 <dec_cb>
+{
+10100522:	842a                	mv	s0,a0
+    ctx->dec.cb = dec_cb;
+10100524:	08f52c23          	sw	a5,152(a0)
+    kptl_decode_init(&ctx->dec);
+10100528:	09050513          	addi	a0,a0,144
+1010052c:	2405                	jal	1010074c <kptl_decode_init>
+    ctx->is_connected = 0;
+    evt = 0;
+}
+1010052e:	40a2                	lw	ra,8(sp)
+    ctx->is_connected = 0;
+10100530:	0e042623          	sw	zero,236(s0)
+}
+10100534:	4412                	lw	s0,4(sp)
+    evt = 0;
+10100536:	c001a423          	sw	zero,-1016(gp) # 20000068 <__bss_start>
+}
+1010053a:	0131                	addi	sp,sp,12
+1010053c:	8082                	ret
+
+1010053e <crc16_update>:
+    @param  src:            current buffer pointer
+    @param  lengthInBytes:  length of current buf
+*/
+void crc16_update(uint16_t *currectCrc, const uint8_t *src, uint32_t lengthInBytes)
+{
+    uint32_t crc = *currectCrc;
+1010053e:	00055703          	lhu	a4,0(a0)
+    uint32_t j;
+    for (j=0; j < lengthInBytes; ++j)
+10100542:	4681                	li	a3,0
+10100544:	00c69563          	bne	a3,a2,1010054e <crc16_update+0x10>
+                temp ^= 0x1021;
+            }
+            crc = temp;
+        }
+    } 
+    *currectCrc = crc;
+10100548:	00e51023          	sh	a4,0(a0)
+}
+1010054c:	8082                	ret
+        uint32_t byte = src[j];
+1010054e:	00d587b3          	add	a5,a1,a3
+10100552:	0007c783          	lbu	a5,0(a5)
+        crc ^= byte << 8;
+10100556:	4321                	li	t1,8
+10100558:	07a2                	slli	a5,a5,0x8
+1010055a:	8fb9                	xor	a5,a5,a4
+            if (crc & 0x8000)
+1010055c:	01079293          	slli	t0,a5,0x10
+            uint32_t temp = crc << 1;
+10100560:	00179713          	slli	a4,a5,0x1
+            if (crc & 0x8000)
+10100564:	0002d663          	bgez	t0,10100570 <crc16_update+0x32>
+                temp ^= 0x1021;
+10100568:	6785                	lui	a5,0x1
+1010056a:	02178793          	addi	a5,a5,33 # 1021 <__stack_size+0xc21>
+1010056e:	8f3d                	xor	a4,a4,a5
+            crc = temp;
+10100570:	137d                	addi	t1,t1,-1
+10100572:	87ba                	mv	a5,a4
+        for (i = 0; i < 8; ++i)
+10100574:	fe0314e3          	bnez	t1,1010055c <crc16_update+0x1e>
+    for (j=0; j < lengthInBytes; ++j)
+10100578:	0685                	addi	a3,a3,1
+1010057a:	b7e9                	j	10100544 <crc16_update+0x6>
+
+1010057c <kptl_create_ack>:
+    p->packet_type = kFramingPacketType_Ping;
+}
+
+void kptl_create_ack(packet_ack_t *p)
+{
+    p->start_byte = kFramingPacketStartByte;
+1010057c:	05a00793          	li	a5,90
+10100580:	00f50023          	sb	a5,0(a0)
+    p->packet_type = kFramingPacketType_Ack;
+10100584:	fa100793          	li	a5,-95
+10100588:	00f500a3          	sb	a5,1(a0)
+}
+1010058c:	8082                	ret
+
+1010058e <kptl_create_ping_resp_packet>:
+
+    return CH_OK;
+}
+
+void kptl_create_ping_resp_packet(ping_resp_packet_t *p, uint8_t major, uint8_t minor, uint8_t bugfix, uint8_t opt_low, uint8_t opt_high)
+{
+1010058e:	1141                	addi	sp,sp,-16
+10100590:	c422                	sw	s0,8(sp)
+10100592:	842a                	mv	s0,a0
+    p->hr.start_byte = kFramingPacketStartByte;
+10100594:	05a00513          	li	a0,90
+10100598:	00a40023          	sb	a0,0(s0)
+    p->hr.packet_type = kFramingPacketType_PingResponse;
+    
+    p->bug_fix = bugfix;
+1010059c:	00d40123          	sb	a3,2(s0)
+    p->hr.packet_type = kFramingPacketType_PingResponse;
+101005a0:	fa700513          	li	a0,-89
+    p->ver_minor = minor;
+    p->ver_major  = major;
+    p->protocol_name = 'P';
+101005a4:	05000693          	li	a3,80
+    p->hr.packet_type = kFramingPacketType_PingResponse;
+101005a8:	00a400a3          	sb	a0,1(s0)
+    p->ver_minor = minor;
+101005ac:	00c401a3          	sb	a2,3(s0)
+    p->ver_major  = major;
+101005b0:	00b40223          	sb	a1,4(s0)
+    p->option_low = opt_low;
+    p->option_high = opt_high;
+101005b4:	00f403a3          	sb	a5,7(s0)
+    p->protocol_name = 'P';
+101005b8:	00d402a3          	sb	a3,5(s0)
+    p->option_low = opt_low;
+101005bc:	00e40323          	sb	a4,6(s0)
+    
+    /* crc */
+    uint16_t crc;
+    crc = 0;
+    crc16_update(&crc, (uint8_t*)&p->hr, 8);
+101005c0:	85a2                	mv	a1,s0
+101005c2:	00210513          	addi	a0,sp,2
+101005c6:	4621                	li	a2,8
+{
+101005c8:	c606                	sw	ra,12(sp)
+    crc = 0;
+101005ca:	00011123          	sh	zero,2(sp)
+    crc16_update(&crc, (uint8_t*)&p->hr, 8);
+101005ce:	3f85                	jal	1010053e <crc16_update>
+    p->crc16[0] = (crc & 0x00FF)>>0;
+101005d0:	00215783          	lhu	a5,2(sp)
+    p->crc16[1] = (crc & 0xFF00)>>8;
+}
+101005d4:	40b2                	lw	ra,12(sp)
+    p->crc16[0] = (crc & 0x00FF)>>0;
+101005d6:	00f40423          	sb	a5,8(s0)
+    p->crc16[1] = (crc & 0xFF00)>>8;
+101005da:	83a1                	srli	a5,a5,0x8
+101005dc:	00f404a3          	sb	a5,9(s0)
+}
+101005e0:	4422                	lw	s0,8(sp)
+101005e2:	0141                	addi	sp,sp,16
+101005e4:	8082                	ret
+
+101005e6 <kptl_frame_packet_begin>:
+
+uint32_t kptl_frame_packet_begin(frame_packet_t *p, uint8_t frame_type)
+{
+101005e6:	1151                	addi	sp,sp,-12
+101005e8:	c406                	sw	ra,8(sp)
+    p->hr.start_byte = kFramingPacketStartByte;
+101005ea:	05a00793          	li	a5,90
+    p->hr.packet_type = frame_type;
+101005ee:	00b500a3          	sb	a1,1(a0)
+    p->hr.start_byte = kFramingPacketStartByte;
+101005f2:	00f50023          	sb	a5,0(a0)
+    p->len[0] = 0;
+101005f6:	00050123          	sb	zero,2(a0)
+    p->len[1] = 0;
+101005fa:	000501a3          	sb	zero,3(a0)
+    p->crc16[0] = 0;
+101005fe:	00050223          	sb	zero,4(a0)
+    p->crc16[1] = 0;
+10100602:	000502a3          	sb	zero,5(a0)
+    memset(p->payload, 0, sizeof(p->payload));
+10100606:	04000613          	li	a2,64
+1010060a:	4581                	li	a1,0
+1010060c:	0519                	addi	a0,a0,6
+1010060e:	013000ef          	jal	ra,10100e20 <memset>
+    return CH_OK;
+}
+10100612:	40a2                	lw	ra,8(sp)
+10100614:	4501                	li	a0,0
+10100616:	0131                	addi	sp,sp,12
+10100618:	8082                	ret
+
+1010061a <kptl_frame_packet_add>:
+
+uint32_t kptl_frame_packet_add(frame_packet_t *p, uint8_t *buf, uint16_t len)
+{
+    /* add item content into buffer */
+    if(ARRAY2INT16(p->len) > MAX_PACKET_LEN)
+1010061a:	00354783          	lbu	a5,3(a0)
+1010061e:	00254703          	lbu	a4,2(a0)
+10100622:	07a2                	slli	a5,a5,0x8
+10100624:	97ba                	add	a5,a5,a4
+10100626:	04000713          	li	a4,64
+1010062a:	02f74c63          	blt	a4,a5,10100662 <kptl_frame_packet_add+0x48>
+{
+1010062e:	1151                	addi	sp,sp,-12
+10100630:	c222                	sw	s0,4(sp)
+10100632:	842a                	mv	s0,a0
+    {
+        return CH_ERR;
+    }
+    
+    memcpy(p->payload + ARRAY2INT16(p->len), buf, len);
+10100634:	0519                	addi	a0,a0,6
+10100636:	953e                	add	a0,a0,a5
+{
+10100638:	c026                	sw	s1,0(sp)
+1010063a:	c406                	sw	ra,8(sp)
+1010063c:	84b2                	mv	s1,a2
+    memcpy(p->payload + ARRAY2INT16(p->len), buf, len);
+1010063e:	2729                	jal	10100d48 <memcpy>
+    p->len[0] += (len >>0) & 0xFF;
+10100640:	00244783          	lbu	a5,2(s0)
+    p->len[1] += (len >>8) & 0xFF;
+    return CH_OK;
+10100644:	4501                	li	a0,0
+    p->len[0] += (len >>0) & 0xFF;
+10100646:	97a6                	add	a5,a5,s1
+10100648:	00f40123          	sb	a5,2(s0)
+    p->len[1] += (len >>8) & 0xFF;
+1010064c:	00344783          	lbu	a5,3(s0)
+10100650:	80a1                	srli	s1,s1,0x8
+10100652:	94be                	add	s1,s1,a5
+10100654:	009401a3          	sb	s1,3(s0)
+}
+10100658:	40a2                	lw	ra,8(sp)
+1010065a:	4412                	lw	s0,4(sp)
+1010065c:	4482                	lw	s1,0(sp)
+1010065e:	0131                	addi	sp,sp,12
+10100660:	8082                	ret
+        return CH_ERR;
+10100662:	4505                	li	a0,1
+}
+10100664:	8082                	ret
+
+10100666 <kptl_frame_packet_final>:
+
+uint32_t kptl_frame_packet_final(frame_packet_t *p)
+{
+10100666:	1141                	addi	sp,sp,-16
+10100668:	c422                	sw	s0,8(sp)
+    
+    /* crc */
+    uint16_t crc;
+    crc = 0;
+    crc16_update(&crc, (uint8_t*)&p->hr, 2);
+1010066a:	85aa                	mv	a1,a0
+{
+1010066c:	842a                	mv	s0,a0
+    crc16_update(&crc, (uint8_t*)&p->hr, 2);
+1010066e:	4609                	li	a2,2
+10100670:	00210513          	addi	a0,sp,2
+{
+10100674:	c606                	sw	ra,12(sp)
+    crc = 0;
+10100676:	00011123          	sh	zero,2(sp)
+    crc16_update(&crc, (uint8_t*)&p->hr, 2);
+1010067a:	35d1                	jal	1010053e <crc16_update>
+    crc16_update(&crc, (uint8_t*)p->len, 2);
+1010067c:	00240593          	addi	a1,s0,2
+10100680:	00210513          	addi	a0,sp,2
+10100684:	4609                	li	a2,2
+10100686:	3d65                	jal	1010053e <crc16_update>
+    crc16_update(&crc, (uint8_t*)p->payload, ARRAY2INT16(p->len));
+10100688:	00344783          	lbu	a5,3(s0)
+1010068c:	00244603          	lbu	a2,2(s0)
+10100690:	00210513          	addi	a0,sp,2
+10100694:	07a2                	slli	a5,a5,0x8
+10100696:	963e                	add	a2,a2,a5
+10100698:	00640593          	addi	a1,s0,6
+1010069c:	354d                	jal	1010053e <crc16_update>
+    
+    p->crc16[0] = (crc & 0x00FF) >> 0;
+1010069e:	00215783          	lhu	a5,2(sp)
+    p->crc16[1] = (crc & 0xFF00) >> 8;
+    return CH_OK;
+}
+101006a2:	40b2                	lw	ra,12(sp)
+101006a4:	4501                	li	a0,0
+    p->crc16[0] = (crc & 0x00FF) >> 0;
+101006a6:	00f40223          	sb	a5,4(s0)
+    p->crc16[1] = (crc & 0xFF00) >> 8;
+101006aa:	83a1                	srli	a5,a5,0x8
+101006ac:	00f402a3          	sb	a5,5(s0)
+}
+101006b0:	4422                	lw	s0,8(sp)
+101006b2:	0141                	addi	sp,sp,16
+101006b4:	8082                	ret
+
+101006b6 <kptl_create_cmd_packet>:
+{
+101006b6:	1141                	addi	sp,sp,-16
+101006b8:	c226                	sw	s1,4(sp)
+101006ba:	84ae                	mv	s1,a1
+    kptl_frame_packet_begin(fp, kFramingPacketType_Command);
+101006bc:	0a400593          	li	a1,164
+{
+101006c0:	c606                	sw	ra,12(sp)
+101006c2:	c422                	sw	s0,8(sp)
+101006c4:	c02a                	sw	a0,0(sp)
+101006c6:	8432                	mv	s0,a2
+    kptl_frame_packet_begin(fp, kFramingPacketType_Command);
+101006c8:	3f39                	jal	101005e6 <kptl_frame_packet_begin>
+    kptl_frame_packet_add(fp, (uint8_t*)cp, 4);
+101006ca:	4502                	lw	a0,0(sp)
+101006cc:	4611                	li	a2,4
+101006ce:	85a6                	mv	a1,s1
+101006d0:	37a9                	jal	1010061a <kptl_frame_packet_add>
+    cp->param = param;
+101006d2:	c0c0                	sw	s0,4(s1)
+    for(i=0; i<cp->param_cnt; i++)
+101006d4:	4401                	li	s0,0
+101006d6:	0034c703          	lbu	a4,3(s1)
+101006da:	00e44863          	blt	s0,a4,101006ea <kptl_create_cmd_packet+0x34>
+}
+101006de:	4422                	lw	s0,8(sp)
+    kptl_frame_packet_final(fp);
+101006e0:	4502                	lw	a0,0(sp)
+}
+101006e2:	40b2                	lw	ra,12(sp)
+101006e4:	4492                	lw	s1,4(sp)
+101006e6:	0141                	addi	sp,sp,16
+    kptl_frame_packet_final(fp);
+101006e8:	bfbd                	j	10100666 <kptl_frame_packet_final>
+        kptl_frame_packet_add(fp, (uint8_t *)&cp->param[i], sizeof(uint32_t));
+101006ea:	40cc                	lw	a1,4(s1)
+101006ec:	4502                	lw	a0,0(sp)
+101006ee:	00241713          	slli	a4,s0,0x2
+101006f2:	4611                	li	a2,4
+101006f4:	95ba                	add	a1,a1,a4
+101006f6:	3715                	jal	1010061a <kptl_frame_packet_add>
+    for(i=0; i<cp->param_cnt; i++)
+101006f8:	0405                	addi	s0,s0,1
+101006fa:	bff1                	j	101006d6 <kptl_create_cmd_packet+0x20>
+
+101006fc <kptl_create_generic_resp_packet>:
+{
+101006fc:	1111                	addi	sp,sp,-28
+    cp.tag = kCommandTag_GenericResponse;
+101006fe:	020007b7          	lui	a5,0x2000
+    param[0] = status_code;
+10100702:	c02e                	sw	a1,0(sp)
+    param[1] = cmd_tag;
+10100704:	c232                	sw	a2,4(sp)
+    cp.tag = kCommandTag_GenericResponse;
+10100706:	0a078793          	addi	a5,a5,160 # 20000a0 <__stack_size+0x1fffca0>
+    kptl_create_cmd_packet(fp, &cp, param);
+1010070a:	860a                	mv	a2,sp
+1010070c:	002c                	addi	a1,sp,8
+{
+1010070e:	cc06                	sw	ra,24(sp)
+    cp.tag = kCommandTag_GenericResponse;
+10100710:	c43e                	sw	a5,8(sp)
+    kptl_create_cmd_packet(fp, &cp, param);
+10100712:	3755                	jal	101006b6 <kptl_create_cmd_packet>
+}
+10100714:	40e2                	lw	ra,24(sp)
+10100716:	4501                	li	a0,0
+10100718:	0171                	addi	sp,sp,28
+1010071a:	8082                	ret
+
+1010071c <kptl_create_property_resp_packet>:
+{
+1010071c:	1131                	addi	sp,sp,-20
+    cp.param_cnt = param_cnt;
+1010071e:	00b101a3          	sb	a1,3(sp)
+    cp.tag = kCommandTag_GetPropertyResponse;
+10100722:	0a700793          	li	a5,167
+    kptl_create_cmd_packet(p, &cp, param);
+10100726:	858a                	mv	a1,sp
+{
+10100728:	c806                	sw	ra,16(sp)
+    cp.tag = kCommandTag_GetPropertyResponse;
+1010072a:	00f11023          	sh	a5,0(sp)
+    cp.reserved = 0x00;
+1010072e:	00010123          	sb	zero,2(sp)
+    kptl_create_cmd_packet(p, &cp, param);
+10100732:	3751                	jal	101006b6 <kptl_create_cmd_packet>
+}
+10100734:	40c2                	lw	ra,16(sp)
+10100736:	4501                	li	a0,0
+10100738:	0151                	addi	sp,sp,20
+1010073a:	8082                	ret
+
+1010073c <kptl_frame_packet_get_size>:
+
+uint32_t kptl_frame_packet_get_size(frame_packet_t *p)
+{
+    return p->len[0] + (p->len[1]<<8) + 6;
+1010073c:	00354783          	lbu	a5,3(a0)
+10100740:	00254503          	lbu	a0,2(a0)
+10100744:	07a2                	slli	a5,a5,0x8
+10100746:	953e                	add	a0,a0,a5
+}
+10100748:	0519                	addi	a0,a0,6
+1010074a:	8082                	ret
+
+1010074c <kptl_decode_init>:
+ * @endcode
+ * @retval None
+ */
+int kptl_decode_init(pkt_dec_t *d)
+{
+    d->cnt = 0;
+1010074c:	00052223          	sw	zero,4(a0)
+    d->status = kStatus_Idle;
+10100750:	00050623          	sb	zero,12(a0)
+    if(!d->fp)
+10100754:	4108                	lw	a0,0(a0)
+10100756:	c919                	beqz	a0,1010076c <kptl_decode_init+0x20>
+{
+10100758:	1151                	addi	sp,sp,-12
+    {
+        return 1;
+    }
+    memset(d->fp, 0, sizeof(frame_packet_t));
+1010075a:	04600613          	li	a2,70
+1010075e:	4581                	li	a1,0
+{
+10100760:	c406                	sw	ra,8(sp)
+    memset(d->fp, 0, sizeof(frame_packet_t));
+10100762:	2d7d                	jal	10100e20 <memset>
+    return 0;
+}
+10100764:	40a2                	lw	ra,8(sp)
+    return 0;
+10100766:	4501                	li	a0,0
+}
+10100768:	0131                	addi	sp,sp,12
+1010076a:	8082                	ret
+        return 1;
+1010076c:	4505                	li	a0,1
+}
+1010076e:	8082                	ret
+
+10100770 <kptl_decode>:
+ * @param  d: decode handle, c: one byte received
+ * @retval CH_OK
+ */
+
+uint32_t kptl_decode(pkt_dec_t *d, uint8_t c)
+{
+10100770:	1121                	addi	sp,sp,-24
+10100772:	c626                	sw	s1,12(sp)
+10100774:	ca06                	sw	ra,20(sp)
+10100776:	c822                	sw	s0,16(sp)
+    int ret = CH_ERR;
+    uint16_t crc_calculated = 0;          /* CRC value caluated from a frame */
+    frame_packet_t *p = d->fp;
+    uint8_t *payload_buf = (uint8_t*)d->fp->payload;
+    
+    switch(d->status)
+10100778:	00c54783          	lbu	a5,12(a0)
+    uint16_t crc_calculated = 0;          /* CRC value caluated from a frame */
+1010077c:	00011523          	sh	zero,10(sp)
+    switch(d->status)
+10100780:	4719                	li	a4,6
+    frame_packet_t *p = d->fp;
+10100782:	4104                	lw	s1,0(a0)
+    switch(d->status)
+10100784:	18f76063          	bltu	a4,a5,10100904 <kptl_decode+0x194>
+10100788:	00000717          	auipc	a4,0x0
+1010078c:	77070713          	addi	a4,a4,1904 # 10100ef8 <memset+0xd8>
+10100790:	078a                	slli	a5,a5,0x2
+10100792:	97ba                	add	a5,a5,a4
+10100794:	439c                	lw	a5,0(a5)
+10100796:	842a                	mv	s0,a0
+10100798:	97ba                	add	a5,a5,a4
+1010079a:	8782                	jr	a5
+    {
+        case kStatus_Idle:
+            if(c == kFramingPacketStartByte)
+1010079c:	05a00713          	li	a4,90
+    int ret = CH_ERR;
+101007a0:	4785                	li	a5,1
+            if(c == kFramingPacketStartByte)
+101007a2:	00e59663          	bne	a1,a4,101007ae <kptl_decode+0x3e>
+            {
+                d->status = kStatus_Cmd;
+101007a6:	00f50623          	sb	a5,12(a0)
+                p->hr.start_byte = c;
+101007aa:	00b48023          	sb	a1,0(s1)
+            break;
+        default:
+            d->status = kStatus_Idle;
+            break;
+    }
+    return ret;
+101007ae:	853e                	mv	a0,a5
+101007b0:	a085                	j	10100810 <kptl_decode+0xa0>
+            p->hr.packet_type = c;
+101007b2:	00b480a3          	sb	a1,1(s1)
+            switch(c)
+101007b6:	05f58593          	addi	a1,a1,95 # 705f <__stack_size+0x6c5f>
+101007ba:	0ff5f593          	andi	a1,a1,255
+101007be:	4799                	li	a5,6
+101007c0:	00b7ee63          	bltu	a5,a1,101007dc <kptl_decode+0x6c>
+101007c4:	00000717          	auipc	a4,0x0
+101007c8:	75070713          	addi	a4,a4,1872 # 10100f14 <memset+0xf4>
+101007cc:	058a                	slli	a1,a1,0x2
+101007ce:	95ba                	add	a1,a1,a4
+101007d0:	419c                	lw	a5,0(a1)
+101007d2:	97ba                	add	a5,a5,a4
+101007d4:	8782                	jr	a5
+                    d->status = kStatus_LenLow;
+101007d6:	4789                	li	a5,2
+            d->status = kStatus_LenHigh;
+101007d8:	00f40623          	sb	a5,12(s0)
+    int ret = CH_ERR;
+101007dc:	4785                	li	a5,1
+101007de:	bfc1                	j	101007ae <kptl_decode+0x3e>
+                    SAFE_CALL_CB;
+101007e0:	451c                	lw	a5,8(a0)
+101007e2:	c399                	beqz	a5,101007e8 <kptl_decode+0x78>
+101007e4:	8526                	mv	a0,s1
+101007e6:	9782                	jalr	a5
+                    d->status = kStatus_Idle;
+101007e8:	00040623          	sb	zero,12(s0)
+                    ret = CH_OK;
+101007ec:	4781                	li	a5,0
+                    break;
+101007ee:	b7c1                	j	101007ae <kptl_decode+0x3e>
+                    p->len[0] = 0;
+101007f0:	00048123          	sb	zero,2(s1)
+                    p->len[1] = 0;
+101007f4:	000481a3          	sb	zero,3(s1)
+            d->cnt = 0;
+101007f8:	00042223          	sw	zero,4(s0)
+            d->status = kStatus_Data;
+101007fc:	4799                	li	a5,6
+101007fe:	bfe9                	j	101007d8 <kptl_decode+0x68>
+                    SAFE_CALL_CB;
+10100800:	451c                	lw	a5,8(a0)
+                    d->status = kStatus_Idle;
+10100802:	00050623          	sb	zero,12(a0)
+                    return CH_OK;
+10100806:	4501                	li	a0,0
+                    SAFE_CALL_CB;
+10100808:	c781                	beqz	a5,10100810 <kptl_decode+0xa0>
+1010080a:	8526                	mv	a0,s1
+1010080c:	9782                	jalr	a5
+                    return CH_OK;
+1010080e:	4501                	li	a0,0
+}
+10100810:	40d2                	lw	ra,20(sp)
+10100812:	4442                	lw	s0,16(sp)
+10100814:	44b2                	lw	s1,12(sp)
+10100816:	0161                	addi	sp,sp,24
+10100818:	8082                	ret
+            p->len[0] = c;
+1010081a:	00b48123          	sb	a1,2(s1)
+            d->status = kStatus_LenHigh;
+1010081e:	478d                	li	a5,3
+10100820:	bf65                	j	101007d8 <kptl_decode+0x68>
+            if(ARRAY2INT16(p->len) <= MAX_PACKET_LEN)
+10100822:	0024c783          	lbu	a5,2(s1)
+            p->len[1] = c;
+10100826:	00b481a3          	sb	a1,3(s1)
+            if(ARRAY2INT16(p->len) <= MAX_PACKET_LEN)
+1010082a:	05a2                	slli	a1,a1,0x8
+1010082c:	95be                	add	a1,a1,a5
+1010082e:	04000793          	li	a5,64
+10100832:	00b7c463          	blt	a5,a1,1010083a <kptl_decode+0xca>
+                d->status = kStatus_CRCLow;
+10100836:	4791                	li	a5,4
+10100838:	b745                	j	101007d8 <kptl_decode+0x68>
+                d->status = kStatus_Idle;
+1010083a:	00050623          	sb	zero,12(a0)
+1010083e:	bf79                	j	101007dc <kptl_decode+0x6c>
+            p->crc16[0] = c;
+10100840:	00b48223          	sb	a1,4(s1)
+            d->status = kStatus_CRCHigh;
+10100844:	4795                	li	a5,5
+10100846:	bf49                	j	101007d8 <kptl_decode+0x68>
+            p->crc16[1] = c;
+10100848:	00b482a3          	sb	a1,5(s1)
+1010084c:	b775                	j	101007f8 <kptl_decode+0x88>
+            payload_buf[d->cnt++] = c;
+1010084e:	415c                	lw	a5,4(a0)
+    uint8_t *payload_buf = (uint8_t*)d->fp->payload;
+10100850:	00648693          	addi	a3,s1,6
+            payload_buf[d->cnt++] = c;
+10100854:	00178713          	addi	a4,a5,1
+10100858:	c158                	sw	a4,4(a0)
+1010085a:	97b6                	add	a5,a5,a3
+1010085c:	00b78023          	sb	a1,0(a5)
+            if((p->hr.packet_type == kFramingPacketType_Command || p->hr.packet_type == kFramingPacketType_Data) && d->cnt >= (uint32_t)(ARRAY2INT16(p->len)))
+10100860:	0014c703          	lbu	a4,1(s1)
+    int ret = CH_ERR;
+10100864:	4785                	li	a5,1
+            if((p->hr.packet_type == kFramingPacketType_Command || p->hr.packet_type == kFramingPacketType_Data) && d->cnt >= (uint32_t)(ARRAY2INT16(p->len)))
+10100866:	05c70713          	addi	a4,a4,92
+1010086a:	0ff77713          	andi	a4,a4,255
+1010086e:	06e7e363          	bltu	a5,a4,101008d4 <kptl_decode+0x164>
+10100872:	0034c703          	lbu	a4,3(s1)
+10100876:	0024c603          	lbu	a2,2(s1)
+1010087a:	0722                	slli	a4,a4,0x8
+1010087c:	9732                	add	a4,a4,a2
+1010087e:	4150                	lw	a2,4(a0)
+10100880:	04e66a63          	bltu	a2,a4,101008d4 <kptl_decode+0x164>
+                crc16_update(&crc_calculated, (uint8_t*)&p->hr, 2);
+10100884:	4609                	li	a2,2
+10100886:	85a6                	mv	a1,s1
+10100888:	00a10513          	addi	a0,sp,10
+1010088c:	c03e                	sw	a5,0(sp)
+                crc_calculated = 0;
+1010088e:	c236                	sw	a3,4(sp)
+10100890:	00011523          	sh	zero,10(sp)
+                crc16_update(&crc_calculated, (uint8_t*)&p->hr, 2);
+10100894:	316d                	jal	1010053e <crc16_update>
+                crc16_update(&crc_calculated, p->len, 2);
+10100896:	4609                	li	a2,2
+10100898:	00248593          	addi	a1,s1,2
+1010089c:	00a10513          	addi	a0,sp,10
+101008a0:	3979                	jal	1010053e <crc16_update>
+                crc16_update(&crc_calculated, payload_buf, d->cnt);
+101008a2:	4692                	lw	a3,4(sp)
+101008a4:	4050                	lw	a2,4(s0)
+101008a6:	00a10513          	addi	a0,sp,10
+101008aa:	85b6                	mv	a1,a3
+101008ac:	3949                	jal	1010053e <crc16_update>
+                if(crc_calculated == ARRAY2INT16(p->crc16))
+101008ae:	0054c703          	lbu	a4,5(s1)
+101008b2:	0044c603          	lbu	a2,4(s1)
+101008b6:	00a15683          	lhu	a3,10(sp)
+101008ba:	0722                	slli	a4,a4,0x8
+101008bc:	9732                	add	a4,a4,a2
+101008be:	4782                	lw	a5,0(sp)
+101008c0:	00e69863          	bne	a3,a4,101008d0 <kptl_decode+0x160>
+                    SAFE_CALL_CB;
+101008c4:	4418                	lw	a4,8(s0)
+                    ret = CH_OK;
+101008c6:	4781                	li	a5,0
+                    SAFE_CALL_CB;
+101008c8:	c701                	beqz	a4,101008d0 <kptl_decode+0x160>
+101008ca:	8526                	mv	a0,s1
+101008cc:	9702                	jalr	a4
+                    ret = CH_OK;
+101008ce:	4781                	li	a5,0
+                d->status = kStatus_Idle;
+101008d0:	00040623          	sb	zero,12(s0)
+            if(p->hr.packet_type == kFramingPacketType_PingResponse && d->cnt >= 8) /* ping response */
+101008d4:	0014c683          	lbu	a3,1(s1)
+101008d8:	0a700713          	li	a4,167
+101008dc:	ece699e3          	bne	a3,a4,101007ae <kptl_decode+0x3e>
+101008e0:	4054                	lw	a3,4(s0)
+101008e2:	471d                	li	a4,7
+101008e4:	ecd775e3          	bgeu	a4,a3,101007ae <kptl_decode+0x3e>
+                p->len[0] = 8;
+101008e8:	4721                	li	a4,8
+101008ea:	00e48123          	sb	a4,2(s1)
+                p->len[1] = 0;
+101008ee:	000481a3          	sb	zero,3(s1)
+                SAFE_CALL_CB;
+101008f2:	4418                	lw	a4,8(s0)
+101008f4:	c709                	beqz	a4,101008fe <kptl_decode+0x18e>
+101008f6:	8526                	mv	a0,s1
+101008f8:	c03e                	sw	a5,0(sp)
+101008fa:	9702                	jalr	a4
+101008fc:	4782                	lw	a5,0(sp)
+                d->status = kStatus_Idle;
+101008fe:	00040623          	sb	zero,12(s0)
+10100902:	b575                	j	101007ae <kptl_decode+0x3e>
+            d->status = kStatus_Idle;
+10100904:	00050623          	sb	zero,12(a0)
+            break;
+10100908:	bdd1                	j	101007dc <kptl_decode+0x6c>
+
+1010090a <mcuboot_send>:
+    	UARTx->SBUF = *buf++;
+1010090a:	c0018793          	addi	a5,gp,-1024 # 20000060 <UARTx>
+1010090e:	439c                	lw	a5,0(a5)
+10100910:	95aa                	add	a1,a1,a0
+    while(len--)
+10100912:	00b51463          	bne	a0,a1,1010091a <mcuboot_send+0x10>
+}
+10100916:	4501                	li	a0,0
+10100918:	8082                	ret
+    	UARTx->SBUF = *buf++;
+1010091a:	0505                	addi	a0,a0,1
+1010091c:	fff54703          	lbu	a4,-1(a0)
+10100920:	c3d8                	sw	a4,4(a5)
+		while(!(UARTx->ISR & UART_FLAG_TI));
+10100922:	4b98                	lw	a4,16(a5)
+10100924:	8b05                	andi	a4,a4,1
+10100926:	df75                	beqz	a4,10100922 <mcuboot_send+0x18>
+		UARTx->ISR = UART_FLAG_TI;
+10100928:	4705                	li	a4,1
+1010092a:	cb98                	sw	a4,16(a5)
+1010092c:	b7dd                	j	10100912 <mcuboot_send+0x8>
+
+1010092e <mcuboot_complete>:
+static void mcuboot_complete(void) { }
+1010092e:	8082                	ret
+
+10100930 <Jump_to_APP>:
+	DisableGlobleIRQ();
+10100930:	300477f3          	csrrci	a5,mstatus,8
+	IOM->AF0   = 0x00005500;
+10100934:	6715                	lui	a4,0x5
+10100936:	400127b7          	lui	a5,0x40012
+1010093a:	50070693          	addi	a3,a4,1280 # 5500 <__stack_size+0x5100>
+1010093e:	40d7ae23          	sw	a3,1052(a5) # 4001241c <_sp+0x2001141c>
+	IOM->AF1   = 0x00000000;
+10100942:	4207a023          	sw	zero,1056(a5)
+	TIMERS->INTCLR = TIM_INTCLR_TIM2;
+10100946:	4689                	li	a3,2
+10100948:	400107b7          	lui	a5,0x40010
+1010094c:	0ad7a423          	sw	a3,168(a5) # 400100a8 <_sp+0x2000f0a8>
+	PLIC_DisableIRQ(TIMER2_IRQn);
+10100950:	e00106b7          	lui	a3,0xe0010
+10100954:	2006a783          	lw	a5,512(a3) # e0010200 <_sp+0xc000f200>
+	SYSC->CLKENCFG = 0x00004801;
+10100958:	80170713          	addi	a4,a4,-2047
+	Jump_To_Application();
+1010095c:	832a                	mv	t1,a0
+	PLIC_DisableIRQ(TIMER2_IRQn);
+1010095e:	9bbd                	andi	a5,a5,-17
+10100960:	20f6a023          	sw	a5,512(a3)
+	SYSC_WPT_UNLOCK();
+10100964:	6699                	lui	a3,0x6
+10100966:	400017b7          	lui	a5,0x40001
+1010096a:	a5a68693          	addi	a3,a3,-1446 # 5a5a <__stack_size+0x565a>
+1010096e:	c3d4                	sw	a3,4(a5)
+10100970:	66a9                	lui	a3,0xa
+10100972:	5a568693          	addi	a3,a3,1445 # a5a5 <__stack_size+0xa1a5>
+10100976:	c3d4                	sw	a3,4(a5)
+	SYSC->MSFTRSTCFG = 0x3E;
+10100978:	03e00693          	li	a3,62
+1010097c:	c7d4                	sw	a3,12(a5)
+	SYSC->CLKENCFG = 0x00004801;
+1010097e:	c798                	sw	a4,8(a5)
+	Jump_To_Application();
+10100980:	8302                	jr	t1
+
+10100982 <mcuboot_jump>:
+    if (addr < APPLICATION_BASE || addr > (APPLICATION_BASE + TARGET_FLASH_SIZE))
+10100982:	efeff7b7          	lui	a5,0xefeff
+10100986:	97aa                	add	a5,a5,a0
+10100988:	671d                	lui	a4,0x7
+1010098a:	00f76363          	bltu	a4,a5,10100990 <mcuboot_jump+0xe>
+        Jump_to_APP(addr);
+1010098e:	b74d                	j	10100930 <Jump_to_APP>
+}
+10100990:	8082                	ret
+
+10100992 <memory_read>:
+{
+10100992:	87ae                	mv	a5,a1
+10100994:	1151                	addi	sp,sp,-12
+    memcpy(buf, (void*)addr, len);
+10100996:	85aa                	mv	a1,a0
+10100998:	853e                	mv	a0,a5
+{
+1010099a:	c406                	sw	ra,8(sp)
+    memcpy(buf, (void*)addr, len);
+1010099c:	2675                	jal	10100d48 <memcpy>
+}
+1010099e:	40a2                	lw	ra,8(sp)
+101009a0:	4501                	li	a0,0
+101009a2:	0131                	addi	sp,sp,12
+101009a4:	8082                	ret
+
+101009a6 <memory_write>:
+{
+101009a6:	1131                	addi	sp,sp,-20
+101009a8:	c622                	sw	s0,12(sp)
+101009aa:	c426                	sw	s1,8(sp)
+101009ac:	c806                	sw	ra,16(sp)
+101009ae:	872a                	mv	a4,a0
+101009b0:	84ae                	mv	s1,a1
+101009b2:	00c587b3          	add	a5,a1,a2
+	for(uint32_t i=0; i<byte_cnt; i++)
+101009b6:	842e                	mv	s0,a1
+101009b8:	00f41863          	bne	s0,a5,101009c8 <memory_write+0x22>
+}
+101009bc:	40c2                	lw	ra,16(sp)
+101009be:	4432                	lw	s0,12(sp)
+101009c0:	44a2                	lw	s1,8(sp)
+101009c2:	4501                	li	a0,0
+101009c4:	0151                	addi	sp,sp,20
+101009c6:	8082                	ret
+	    EFC_SingleProgram(start_addr+i, buf[i], EFC_PRG_BYTE);
+101009c8:	00044583          	lbu	a1,0(s0)
+101009cc:	40970533          	sub	a0,a4,s1
+101009d0:	9522                	add	a0,a0,s0
+101009d2:	4601                	li	a2,0
+101009d4:	c23e                	sw	a5,4(sp)
+101009d6:	c03a                	sw	a4,0(sp)
+101009d8:	2cf1                	jal	10100cb4 <EFC_SingleProgram>
+101009da:	0405                	addi	s0,s0,1
+101009dc:	4792                	lw	a5,4(sp)
+101009de:	4702                	lw	a4,0(sp)
+101009e0:	bfe1                	j	101009b8 <memory_write+0x12>
+
+101009e2 <memory_erase>:
+{
+101009e2:	1141                	addi	sp,sp,-16
+101009e4:	c422                	sw	s0,8(sp)
+101009e6:	c226                	sw	s1,4(sp)
+101009e8:	c606                	sw	ra,12(sp)
+101009ea:	84aa                	mv	s1,a0
+    addr = start_addr;
+101009ec:	842a                	mv	s0,a0
+    while(addr < (byte_cnt + start_addr))
+101009ee:	00b487b3          	add	a5,s1,a1
+101009f2:	00f46863          	bltu	s0,a5,10100a02 <memory_erase+0x20>
+}
+101009f6:	40b2                	lw	ra,12(sp)
+101009f8:	4422                	lw	s0,8(sp)
+101009fa:	4492                	lw	s1,4(sp)
+101009fc:	4501                	li	a0,0
+101009fe:	0141                	addi	sp,sp,16
+10100a00:	8082                	ret
+        EFC_PageErase(addr);
+10100a02:	8522                	mv	a0,s0
+10100a04:	c02e                	sw	a1,0(sp)
+10100a06:	24f5                	jal	10100cf2 <EFC_PageErase>
+        addr += 512;
+10100a08:	20040413          	addi	s0,s0,512
+10100a0c:	4582                	lw	a1,0(sp)
+10100a0e:	b7c5                	j	101009ee <memory_erase+0xc>
+
+10100a10 <TIM_ClkInit>:
+	SYSC->CLKENCFG = 0x00005cf9;
+10100a10:	6799                	lui	a5,0x6
+10100a12:	40001737          	lui	a4,0x40001
+10100a16:	cf978793          	addi	a5,a5,-775 # 5cf9 <__stack_size+0x58f9>
+10100a1a:	c71c                	sw	a5,8(a4)
+	SYSC->TIMCLKDIV = 0x00000707;
+10100a1c:	70700793          	li	a5,1799
+10100a20:	cf1c                	sw	a5,24(a4)
+	TIM1->CTCG1 = 0x00000000;
+10100a22:	400107b7          	lui	a5,0x40010
+10100a26:	0007a023          	sw	zero,0(a5) # 40010000 <_sp+0x2000f000>
+	TIM2->CTCG1 = 0x0000c34f;
+10100a2a:	6731                	lui	a4,0xc
+	TIM1->CTCG2 = 0x00000000;
+10100a2c:	0007a223          	sw	zero,4(a5)
+	TIM2->CTCG1 = 0x0000c34f;
+10100a30:	34f70713          	addi	a4,a4,847 # c34f <__stack_size+0xbf4f>
+10100a34:	cbd8                	sw	a4,20(a5)
+	TIM2->CTCG2 = 0x00000000;
+10100a36:	0007ac23          	sw	zero,24(a5)
+	PLIC_SetPriority(TIMER2_IRQn, 1);
+10100a3a:	e0010737          	lui	a4,0xe0010
+10100a3e:	4685                	li	a3,1
+10100a40:	cb14                	sw	a3,16(a4)
+	PLIC_EnableIRQ(TIMER2_IRQn);
+10100a42:	20072683          	lw	a3,512(a4) # e0010200 <_sp+0xc000f200>
+10100a46:	0106e693          	ori	a3,a3,16
+10100a4a:	20d72023          	sw	a3,512(a4)
+	TIMERS->INTCLR = TIM_INTCLR_TIM2;
+10100a4e:	4689                	li	a3,2
+10100a50:	0ad7a423          	sw	a3,168(a5)
+	TIMERS->CON = 0x00000223;
+10100a54:	22300713          	li	a4,547
+10100a58:	0ae7a023          	sw	a4,160(a5)
+}
+10100a5c:	8082                	ret
+
+10100a5e <Delay_Nus>:
+    u32 start = TIM1->CTVAL;
+10100a5e:	400107b7          	lui	a5,0x40010
+10100a62:	4798                	lw	a4,8(a5)
+    while((start -(u32)TIM1->CTVAL) < delay) __asm("NOP");
+10100a64:	400107b7          	lui	a5,0x40010
+10100a68:	479c                	lw	a5,8(a5)
+10100a6a:	40f707b3          	sub	a5,a4,a5
+10100a6e:	00a7e363          	bltu	a5,a0,10100a74 <Delay_Nus+0x16>
+}
+10100a72:	8082                	ret
+    while((start -(u32)TIM1->CTVAL) < delay) __asm("NOP");
+10100a74:	0001                	nop
+10100a76:	b7fd                	j	10100a64 <Delay_Nus+0x6>
+
+10100a78 <mcuboot_reset>:
+    Delay_Nus(200000);
+10100a78:	00031537          	lui	a0,0x31
+{
+10100a7c:	1151                	addi	sp,sp,-12
+    Delay_Nus(200000);
+10100a7e:	d4050513          	addi	a0,a0,-704 # 30d40 <__stack_size+0x30940>
+{
+10100a82:	c406                	sw	ra,8(sp)
+    Delay_Nus(200000);
+10100a84:	3fe9                	jal	10100a5e <Delay_Nus>
+	SYSC_WPT_UNLOCK();
+10100a86:	6719                	lui	a4,0x6
+10100a88:	400017b7          	lui	a5,0x40001
+10100a8c:	a5a70713          	addi	a4,a4,-1446 # 5a5a <__stack_size+0x565a>
+10100a90:	c3d8                	sw	a4,4(a5)
+10100a92:	6729                	lui	a4,0xa
+10100a94:	5a570713          	addi	a4,a4,1445 # a5a5 <__stack_size+0xa1a5>
+}
+10100a98:	40a2                	lw	ra,8(sp)
+	SYSC_WPT_UNLOCK();
+10100a9a:	c3d8                	sw	a4,4(a5)
+    SYSC->MSFTRSTCFG = SYSC_MSFTRSTCFG_DIG;
+10100a9c:	20000713          	li	a4,512
+10100aa0:	c7d8                	sw	a4,12(a5)
+}
+10100aa2:	0131                	addi	sp,sp,12
+10100aa4:	8082                	ret
+
+10100aa6 <UART_HalInit>:
+	IOM->ADS   = 0x00000000;
+10100aa6:	400127b7          	lui	a5,0x40012
+	IOM->AF0   = 0x5000CA00;
+10100aaa:	5000d737          	lui	a4,0x5000d
+	IOM->ADS   = 0x00000000;
+10100aae:	4007aa23          	sw	zero,1044(a5) # 40012414 <_sp+0x20011414>
+	IOM->AF0   = 0x5000CA00;
+10100ab2:	a0070713          	addi	a4,a4,-1536 # 5000ca00 <_sp+0x3000ba00>
+10100ab6:	40e7ae23          	sw	a4,1052(a5)
+	IOM->AF1   = 0x000000C0;
+10100aba:	0c000713          	li	a4,192
+10100abe:	42e7a023          	sw	a4,1056(a5)
+	IOM->OE    = 0x00000000;
+10100ac2:	4007a223          	sw	zero,1028(a5)
+	IOM->PU    = 0x00000000;
+10100ac6:	4007a423          	sw	zero,1032(a5)
+	IOM->PD    = 0x00000000;
+10100aca:	4007a623          	sw	zero,1036(a5)
+	IOM->OTYPE = 0x00000000;
+10100ace:	4007a823          	sw	zero,1040(a5)
+	IOM->DRS   = 0x00000000;
+10100ad2:	4007ac23          	sw	zero,1048(a5)
+	UART1->SCON = 0x00000140;
+10100ad6:	14000693          	li	a3,320
+10100ada:	400117b7          	lui	a5,0x40011
+10100ade:	c394                	sw	a3,0(a5)
+	UART1->BDIV = 0x00000115;
+10100ae0:	11500713          	li	a4,277
+10100ae4:	cbd8                	sw	a4,20(a5)
+	UART2->SCON = 0x00000140;
+10100ae6:	c0d7a023          	sw	a3,-1024(a5) # 40010c00 <_sp+0x2000fc00>
+	UART2->BDIV = 0x00000115;
+10100aea:	c0e7aa23          	sw	a4,-1004(a5)
+}
+10100aee:	8082                	ret
+
+10100af0 <FLASH_HalInit>:
+	EFC_WPT_UNLOCK();
+10100af0:	400007b7          	lui	a5,0x40000
+10100af4:	0c300693          	li	a3,195
+10100af8:	cf94                	sw	a3,24(a5)
+10100afa:	03c00713          	li	a4,60
+10100afe:	cf98                	sw	a4,24(a5)
+	EFC->CR    = 0xf9c39000;
+10100b00:	f9c39637          	lui	a2,0xf9c39
+10100b04:	c390                	sw	a2,0(a5)
+	EFC_WPT_UNLOCK();
+10100b06:	cf94                	sw	a3,24(a5)
+10100b08:	cf98                	sw	a4,24(a5)
+	EFC->TNVS  = 0x0000000e;
+10100b0a:	4639                	li	a2,14
+10100b0c:	c3d0                	sw	a2,4(a5)
+	EFC_WPT_UNLOCK();
+10100b0e:	cf94                	sw	a3,24(a5)
+10100b10:	cf98                	sw	a4,24(a5)
+	EFC->TPROG = 0x0000000e;
+10100b12:	c790                	sw	a2,8(a5)
+	EFC_WPT_UNLOCK();
+10100b14:	cf94                	sw	a3,24(a5)
+10100b16:	cf98                	sw	a4,24(a5)
+	EFC->TPGS  = 0x0000000c;
+10100b18:	4631                	li	a2,12
+10100b1a:	c7d0                	sw	a2,12(a5)
+	EFC_WPT_UNLOCK();
+10100b1c:	cf94                	sw	a3,24(a5)
+	EFC->TRCV  = 0x000cf1e0;
+10100b1e:	000cf637          	lui	a2,0xcf
+	EFC_WPT_UNLOCK();
+10100b22:	cf98                	sw	a4,24(a5)
+	EFC->TRCV  = 0x000cf1e0;
+10100b24:	1e060613          	addi	a2,a2,480 # cf1e0 <__stack_size+0xcede0>
+10100b28:	cb90                	sw	a2,16(a5)
+	EFC_WPT_UNLOCK();
+10100b2a:	cf94                	sw	a3,24(a5)
+10100b2c:	cf98                	sw	a4,24(a5)
+	EFC->TERS  = 0x000004c6;
+10100b2e:	4c600713          	li	a4,1222
+10100b32:	cbd8                	sw	a4,20(a5)
+}
+10100b34:	8082                	ret
+
+10100b36 <TIMER2_IrqHandler>:
+
+	return 0;
+}
+
+void TIMER2_IrqHandler(void)
+{
+10100b36:	1151                	addi	sp,sp,-12
+10100b38:	c222                	sw	s0,4(sp)
+    static int timeout = 0;
+
+	TIMERS->INTCLR = TIM_INTCLR_TIM2;
+10100b3a:	400107b7          	lui	a5,0x40010
+{
+10100b3e:	c406                	sw	ra,8(sp)
+	TIMERS->INTCLR = TIM_INTCLR_TIM2;
+10100b40:	4709                	li	a4,2
+10100b42:	0ae7a423          	sw	a4,168(a5) # 400100a8 <_sp+0x2000f0a8>
+	
+    if(timeout > BL_TIMEOUT_MS/100)
+10100b46:	c0c18793          	addi	a5,gp,-1012 # 2000006c <timeout.3873>
+10100b4a:	4394                	lw	a3,0(a5)
+10100b4c:	843e                	mv	s0,a5
+10100b4e:	02d75263          	bge	a4,a3,10100b72 <TIMER2_IrqHandler+0x3c>
+    {
+        if(force_enter_bl == 0 && mcuboot_is_connected(&mcuboot) == 0)
+10100b52:	c1418513          	addi	a0,gp,-1004 # 20000074 <mcuboot>
+10100b56:	e36ff0ef          	jal	ra,1010018c <mcuboot_is_connected>
+10100b5a:	e501                	bnez	a0,10100b62 <TIMER2_IrqHandler+0x2c>
+        {
+            timeout_jump = 1;
+10100b5c:	4785                	li	a5,1
+10100b5e:	c0f18823          	sb	a5,-1008(gp) # 20000070 <timeout_jump>
+        }
+		TIMERS->CON &= ~TIM_CON_IE_TIM2;
+10100b62:	40010737          	lui	a4,0x40010
+10100b66:	0a072783          	lw	a5,160(a4) # 400100a0 <_sp+0x2000f0a0>
+10100b6a:	dff7f793          	andi	a5,a5,-513
+10100b6e:	0af72023          	sw	a5,160(a4)
+    }
+    timeout++;
+10100b72:	401c                	lw	a5,0(s0)
+10100b74:	0785                	addi	a5,a5,1
+10100b76:	c0f1a623          	sw	a5,-1012(gp) # 2000006c <timeout.3873>
+	if(timeout == 2 && !mcuboot.is_connected)			// 200ms后切换复用端口检测
+10100b7a:	4709                	li	a4,2
+10100b7c:	02e79363          	bne	a5,a4,10100ba2 <TIMER2_IrqHandler+0x6c>
+10100b80:	c1418793          	addi	a5,gp,-1004 # 20000074 <mcuboot>
+10100b84:	0ec7a783          	lw	a5,236(a5)
+10100b88:	ef89                	bnez	a5,10100ba2 <TIMER2_IrqHandler+0x6c>
+	{
+		IOM->AF0 = 0x4000F800;
+10100b8a:	40010737          	lui	a4,0x40010
+10100b8e:	400127b7          	lui	a5,0x40012
+10100b92:	80070713          	addi	a4,a4,-2048 # 4000f800 <_sp+0x2000e800>
+10100b96:	40e7ae23          	sw	a4,1052(a5) # 4001241c <_sp+0x2001141c>
+		IOM->AF1 = 0x000000F0;
+10100b9a:	0f000713          	li	a4,240
+10100b9e:	42e7a023          	sw	a4,1056(a5)
+	}
+}
+10100ba2:	40a2                	lw	ra,8(sp)
+10100ba4:	4412                	lw	s0,4(sp)
+10100ba6:	0131                	addi	sp,sp,12
+10100ba8:	8082                	ret
+
+10100baa <_exit>:
+	//   write_hex(STDERR_FILENO, code);
+	//   write(STDERR_FILENO, "\n", 1);
+
+	(void)code;
+	for (;;)
+		;
+10100baa:	a001                	j	10100baa <_exit>
+
+10100bac <trap_entry>:
+
+  .section      .text.entry
+  .align 2
+  .global trap_entry
+trap_entry:
+  TRAP_ENTRY
+10100bac:	7139                	addi	sp,sp,-64
+10100bae:	c006                	sw	ra,0(sp)
+10100bb0:	c216                	sw	t0,4(sp)
+10100bb2:	c41a                	sw	t1,8(sp)
+10100bb4:	c61e                	sw	t2,12(sp)
+10100bb6:	c82a                	sw	a0,16(sp)
+10100bb8:	ca2e                	sw	a1,20(sp)
+10100bba:	cc32                	sw	a2,24(sp)
+10100bbc:	ce36                	sw	a3,28(sp)
+10100bbe:	d03a                	sw	a4,32(sp)
+10100bc0:	d23e                	sw	a5,36(sp)
+
+  csrr a0, mcause
+10100bc2:	34202573          	csrr	a0,mcause
+  csrr a1, mepc
+10100bc6:	341025f3          	csrr	a1,mepc
+  call handle_trap
+10100bca:	200d                	jal	10100bec <handle_trap>
+
+
+  csrw mepc, a0
+10100bcc:	34151073          	csrw	mepc,a0
+  TRAP_EXIT
+10100bd0:	4082                	lw	ra,0(sp)
+10100bd2:	4292                	lw	t0,4(sp)
+10100bd4:	4322                	lw	t1,8(sp)
+10100bd6:	43b2                	lw	t2,12(sp)
+10100bd8:	4542                	lw	a0,16(sp)
+10100bda:	45d2                	lw	a1,20(sp)
+10100bdc:	4662                	lw	a2,24(sp)
+10100bde:	46f2                	lw	a3,28(sp)
+10100be0:	5702                	lw	a4,32(sp)
+10100be2:	5792                	lw	a5,36(sp)
+10100be4:	6121                	addi	sp,sp,64
+10100be6:	30200073          	mret
+
+
+.weak handle_trap
+handle_trap:
+1:
+  j 1b
+10100bea:	a001                	j	10100bea <trap_entry+0x3e>
+
+10100bec <handle_trap>:
+  * @retval None
+  */
+unsigned int handle_trap(unsigned int mcause, unsigned int epc)
+{
+	/* External Machine-Level interrupt from PLIC */
+	if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == EXP_M_EXT_INT) && (PLIC_GetCLAIM() == TIMER2_IRQn))
+10100bec:	02055e63          	bgez	a0,10100c28 <handle_trap+0x3c>
+10100bf0:	00151793          	slli	a5,a0,0x1
+10100bf4:	8385                	srli	a5,a5,0x1
+10100bf6:	472d                	li	a4,11
+10100bf8:	02e79863          	bne	a5,a4,10100c28 <handle_trap+0x3c>
+{
+10100bfc:	1141                	addi	sp,sp,-16
+10100bfe:	c422                	sw	s0,8(sp)
+	if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == EXP_M_EXT_INT) && (PLIC_GetCLAIM() == TIMER2_IRQn))
+10100c00:	e0010437          	lui	s0,0xe0010
+{
+10100c04:	c226                	sw	s1,4(sp)
+	if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == EXP_M_EXT_INT) && (PLIC_GetCLAIM() == TIMER2_IRQn))
+10100c06:	30442483          	lw	s1,772(s0) # e0010304 <_sp+0xc000f304>
+{
+10100c0a:	c606                	sw	ra,12(sp)
+	if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == EXP_M_EXT_INT) && (PLIC_GetCLAIM() == TIMER2_IRQn))
+10100c0c:	4791                	li	a5,4
+10100c0e:	00f49763          	bne	s1,a5,10100c1c <handle_trap+0x30>
+10100c12:	c02e                	sw	a1,0(sp)
+	{
+		/* Handle the corresponding interrupt */
+		TIMER2_IrqHandler();
+10100c14:	370d                	jal	10100b36 <TIMER2_IrqHandler>
+		
+		/* Clear interrupt source */
+		PLIC_SetCLAIM(TIMER2_IRQn);
+10100c16:	4582                	lw	a1,0(sp)
+10100c18:	30942223          	sw	s1,772(s0)
+	}
+
+	/* Returns the return address of the exception */
+	return epc;
+}
+10100c1c:	40b2                	lw	ra,12(sp)
+10100c1e:	4422                	lw	s0,8(sp)
+10100c20:	4492                	lw	s1,4(sp)
+10100c22:	852e                	mv	a0,a1
+10100c24:	0141                	addi	sp,sp,16
+10100c26:	8082                	ret
+10100c28:	852e                	mv	a0,a1
+10100c2a:	8082                	ret
+
+10100c2c <SystemInit>:
+	SYSC->WRPROCFG	= SYSC_WRPROCFG_V0;
+	SYSC->WRPROCFG	= SYSC_WRPROCFG_V1;
+	SYSC->CLKCTRCFG = tmpreg;
+#else
+	/* Turn on ANAC clocks */
+	SYSC->CLKENCFG |= SYSC_CLKENCFG_ANAC;
+10100c2c:	40001737          	lui	a4,0x40001
+10100c30:	471c                	lw	a5,8(a4)
+10100c32:	6685                	lui	a3,0x1
+
+	/* Enable main frequency oscillator HRC */
+	ANAC->WPROT = ANAC_WPROT_V0;
+10100c34:	6599                	lui	a1,0x6
+	SYSC->CLKENCFG |= SYSC_CLKENCFG_ANAC;
+10100c36:	8fd5                	or	a5,a5,a3
+10100c38:	c71c                	sw	a5,8(a4)
+	ANAC->WPROT = ANAC_WPROT_V0;
+10100c3a:	a5a58593          	addi	a1,a1,-1446 # 5a5a <__stack_size+0x565a>
+10100c3e:	400127b7          	lui	a5,0x40012
+	ANAC->WPROT = ANAC_WPROT_V1;
+10100c42:	6629                	lui	a2,0xa
+	ANAC->WPROT = ANAC_WPROT_V0;
+10100c44:	c2b7ae23          	sw	a1,-964(a5) # 40011c3c <_sp+0x20010c3c>
+	ANAC->WPROT = ANAC_WPROT_V1;
+10100c48:	5a560613          	addi	a2,a2,1445 # a5a5 <__stack_size+0xa1a5>
+10100c4c:	c2c7ae23          	sw	a2,-964(a5)
+	ANAC->CLK_CFG |= ANAC_CLK_CFG_HRC_EN;
+10100c50:	c207a503          	lw	a0,-992(a5)
+10100c54:	00256513          	ori	a0,a0,2
+10100c58:	c2a7a023          	sw	a0,-992(a5)
+
+	/* Calculate high-speed crystal oscillator frequency gear */
+	tmpreg = ANAC->CLK_CFG;
+10100c5c:	c207a503          	lw	a0,-992(a5)
+	tmpreg &= ~ANAC_CLK_CFG_HRC_FSEL;
+	tmpreg |= SYSC_CLK_SRC_SEL << ANAC_CLK_CFG_HRC_FSEL_pos;
+
+	/* The high-speed crystal oscillator frequency gear value is written into the register */
+	ANAC->WPROT	  = ANAC_WPROT_V0;
+10100c60:	c2b7ae23          	sw	a1,-964(a5)
+	ANAC->WPROT	  = ANAC_WPROT_V1;
+10100c64:	c2c7ae23          	sw	a2,-964(a5)
+	tmpreg &= ~ANAC_CLK_CFG_HRC_FSEL;
+10100c68:	990d                	andi	a0,a0,-29
+	tmpreg |= SYSC_CLK_SRC_SEL << ANAC_CLK_CFG_HRC_FSEL_pos;
+10100c6a:	01056513          	ori	a0,a0,16
+	ANAC->CLK_CFG = tmpreg;
+10100c6e:	c2a7a023          	sw	a0,-992(a5)
+
+	/* Calculate and configure the system clock source and bus divider value */
+	tmpreg = SYSC->CLKCTRCFG;
+10100c72:	431c                	lw	a5,0(a4)
+	tmpreg &= ~(SYSC_CLKCTRCFG_APB_CLK_DIV | SYSC_CLKCTRCFG_AHB_CLK_DIV | SYSC_CLKCTRCFG_SYS_CLK_SEL);
+10100c74:	ff808537          	lui	a0,0xff808
+	tmpreg |= ((SYSC_AHB_DIV << SYSC_CLKCTRCFG_AHB_CLK_DIV_pos) | (SYSC_APB_DIV << SYSC_CLKCTRCFG_APB_CLK_DIV_pos) |
+			   SYSC_CLKCTRCFG_SYS_CLK_SEL_HRC);
+
+	/* The system clock source and bus divider value are written to the register */
+	SYSC->WRPROCFG	= SYSC_WRPROCFG_V0;
+10100c78:	c34c                	sw	a1,4(a4)
+	tmpreg &= ~(SYSC_CLKCTRCFG_APB_CLK_DIV | SYSC_CLKCTRCFG_AHB_CLK_DIV | SYSC_CLKCTRCFG_SYS_CLK_SEL);
+10100c7a:	0fe50513          	addi	a0,a0,254 # ff8080fe <_sp+0xdf8070fe>
+10100c7e:	8fe9                	and	a5,a5,a0
+	SYSC->WRPROCFG	= SYSC_WRPROCFG_V1;
+10100c80:	c350                	sw	a2,4(a4)
+	SYSC->CLKCTRCFG = tmpreg;
+10100c82:	c31c                	sw	a5,0(a4)
+	UART_Init(UART1, &UART_InitStructure);
+#endif
+#endif
+
+	/* Configure exception entry address */
+	WRITE_CSR(mtvec, &trap_entry);
+10100c84:	00000797          	auipc	a5,0x0
+10100c88:	f2878793          	addi	a5,a5,-216 # 10100bac <trap_entry>
+10100c8c:	30579073          	csrw	mtvec,a5
+
+	/* Enable global interrupt */
+	EnableGlobleIRQ();
+10100c90:	300467f3          	csrrsi	a5,mstatus,8
+
+	/* Enable external interrupt */
+	EnableExtIRQ();
+10100c94:	80068693          	addi	a3,a3,-2048 # 800 <__stack_size+0x400>
+10100c98:	3046a6f3          	csrrs	a3,mie,a3
+}
+10100c9c:	8082                	ret
+
+10100c9e <EFC_GetEFCStatus>:
+  */
+EFC_Status EFC_GetEFCStatus(void)
+{
+	EFC_Status status = EFC_SUCCESS;
+
+	if (!(EFC->STS))
+10100c9e:	400007b7          	lui	a5,0x40000
+10100ca2:	53d8                	lw	a4,36(a5)
+	{
+		/* No status flag to generate EFC exception */
+		status = EFC_FAIL;
+10100ca4:	4505                	li	a0,1
+	if (!(EFC->STS))
+10100ca6:	c711                	beqz	a4,10100cb2 <EFC_GetEFCStatus+0x14>
+	}
+	else if (EFC->STS & (~EFC_STS_CD))
+10100ca8:	53c8                	lw	a0,36(a5)
+10100caa:	9979                	andi	a0,a0,-2
+		status = EFC_ERROR;
+	}
+	else
+	{
+		/* Operation completed normally */
+		status = EFC_SUCCESS;
+10100cac:	00153513          	seqz	a0,a0
+10100cb0:	0506                	slli	a0,a0,0x1
+	}
+
+	/* Return the EFC Status */
+	return status;
+}
+10100cb2:	8082                	ret
+
+10100cb4 <EFC_SingleProgram>:
+	/* Check the parameters */
+	PARAM_CHECK(IS_EFC_MEM_ADDR(Addr));
+	PARAM_CHECK(IS_EFC_PRG_TYPE(PrgType));
+
+	/* Clear EFC Status Register */
+	tempreg	 = EFC->STS;
+10100cb4:	400007b7          	lui	a5,0x40000
+10100cb8:	53d8                	lw	a4,36(a5)
+	EFC->STS = tempreg;
+10100cba:	d3d8                	sw	a4,36(a5)
+
+	/* The OPR register of the EFC performs a single-address programming operation */
+	EFC_OPR_OPEN(EFC_OPR_OPRMODE_SIG_PRG);
+10100cbc:	0007ae23          	sw	zero,28(a5) # 4000001c <_sp+0x1ffff01c>
+10100cc0:	07000713          	li	a4,112
+10100cc4:	cfd8                	sw	a4,28(a5)
+10100cc6:	09000713          	li	a4,144
+10100cca:	cfd8                	sw	a4,28(a5)
+10100ccc:	0c000713          	li	a4,192
+10100cd0:	cfd8                	sw	a4,28(a5)
+
+	/* Write data to the corresponding address */
+	if (PrgType == EFC_PRG_BYTE)
+10100cd2:	e611                	bnez	a2,10100cde <EFC_SingleProgram+0x2a>
+	{
+		/* byte programming */
+		REG8(Addr) = Data;
+10100cd4:	0ff5f593          	andi	a1,a1,255
+10100cd8:	00b50023          	sb	a1,0(a0)
+		PARAM_CHECK(IS_WORD_ADDR(Addr));
+		REG32(Addr) = Data;
+	}
+
+	/* Check for the EFC Status */
+	status = EFC_GetEFCStatus();
+10100cdc:	b7c9                	j	10100c9e <EFC_GetEFCStatus>
+	else if (PrgType == EFC_PRG_HWORD)
+10100cde:	4785                	li	a5,1
+10100ce0:	00f61763          	bne	a2,a5,10100cee <EFC_SingleProgram+0x3a>
+		REG16(Addr) = Data;
+10100ce4:	05c2                	slli	a1,a1,0x10
+10100ce6:	81c1                	srli	a1,a1,0x10
+10100ce8:	00b51023          	sh	a1,0(a0)
+10100cec:	bfc5                	j	10100cdc <EFC_SingleProgram+0x28>
+		REG32(Addr) = Data;
+10100cee:	c10c                	sw	a1,0(a0)
+10100cf0:	b7f5                	j	10100cdc <EFC_SingleProgram+0x28>
+
+10100cf2 <EFC_PageErase>:
+
+	/* Check the parameters */
+	PARAM_CHECK(IS_EFC_MEM_ADDR(Addr));
+
+	/* Clear EFC Status Register */
+	tempreg	 = EFC->STS;
+10100cf2:	400007b7          	lui	a5,0x40000
+10100cf6:	53d8                	lw	a4,36(a5)
+	EFC->STS = tempreg;
+10100cf8:	d3d8                	sw	a4,36(a5)
+
+	/* The OPR register of the EFC performs the page erase operation */
+	EFC_OPR_OPEN(EFC_OPR_OPRMODE_PAGE_ERASE);
+10100cfa:	4709                	li	a4,2
+10100cfc:	cfd8                	sw	a4,28(a5)
+10100cfe:	07200713          	li	a4,114
+10100d02:	cfd8                	sw	a4,28(a5)
+10100d04:	09200713          	li	a4,146
+10100d08:	cfd8                	sw	a4,28(a5)
+10100d0a:	0c200713          	li	a4,194
+10100d0e:	cfd8                	sw	a4,28(a5)
+
+	/* Write any value to the corresponding address */
+	REG8(Addr) = 0xFF;
+10100d10:	57fd                	li	a5,-1
+10100d12:	00f50023          	sb	a5,0(a0)
+
+	/* Check for the EFC Status */
+	status = EFC_GetEFCStatus();
+10100d16:	b761                	j	10100c9e <EFC_GetEFCStatus>
+
+10100d18 <exit>:
+10100d18:	1151                	addi	sp,sp,-12
+10100d1a:	c222                	sw	s0,4(sp)
+10100d1c:	c406                	sw	ra,8(sp)
+10100d1e:	efeff797          	auipc	a5,0xefeff
+10100d22:	2e278793          	addi	a5,a5,738 # 0 <__stack_size-0x400>
+10100d26:	842a                	mv	s0,a0
+10100d28:	c791                	beqz	a5,10100d34 <exit+0x1c>
+10100d2a:	4581                	li	a1,0
+10100d2c:	00000097          	auipc	ra,0x0
+10100d30:	000000e7          	jalr	zero # 0 <__stack_size-0x400>
+10100d34:	00000797          	auipc	a5,0x0
+10100d38:	1fc78793          	addi	a5,a5,508 # 10100f30 <_global_impure_ptr>
+10100d3c:	4388                	lw	a0,0(a5)
+10100d3e:	551c                	lw	a5,40(a0)
+10100d40:	c391                	beqz	a5,10100d44 <exit+0x2c>
+10100d42:	9782                	jalr	a5
+10100d44:	8522                	mv	a0,s0
+10100d46:	3595                	jal	10100baa <_exit>
+
+10100d48 <memcpy>:
+10100d48:	00a5c7b3          	xor	a5,a1,a0
+10100d4c:	8b8d                	andi	a5,a5,3
+10100d4e:	00c50733          	add	a4,a0,a2
+10100d52:	e781                	bnez	a5,10100d5a <memcpy+0x12>
+10100d54:	478d                	li	a5,3
+10100d56:	02c7e963          	bltu	a5,a2,10100d88 <memcpy+0x40>
+10100d5a:	87aa                	mv	a5,a0
+10100d5c:	0ce57163          	bgeu	a0,a4,10100e1e <memcpy+0xd6>
+10100d60:	0005c683          	lbu	a3,0(a1)
+10100d64:	0785                	addi	a5,a5,1
+10100d66:	0585                	addi	a1,a1,1
+10100d68:	fed78fa3          	sb	a3,-1(a5)
+10100d6c:	fee7eae3          	bltu	a5,a4,10100d60 <memcpy+0x18>
+10100d70:	8082                	ret
+10100d72:	0005c683          	lbu	a3,0(a1)
+10100d76:	0785                	addi	a5,a5,1
+10100d78:	0585                	addi	a1,a1,1
+10100d7a:	fed78fa3          	sb	a3,-1(a5)
+10100d7e:	fee7eae3          	bltu	a5,a4,10100d72 <memcpy+0x2a>
+10100d82:	4402                	lw	s0,0(sp)
+10100d84:	0111                	addi	sp,sp,4
+10100d86:	8082                	ret
+10100d88:	00357693          	andi	a3,a0,3
+10100d8c:	87aa                	mv	a5,a0
+10100d8e:	ca91                	beqz	a3,10100da2 <memcpy+0x5a>
+10100d90:	0005c683          	lbu	a3,0(a1)
+10100d94:	0785                	addi	a5,a5,1
+10100d96:	0585                	addi	a1,a1,1
+10100d98:	fed78fa3          	sb	a3,-1(a5)
+10100d9c:	0037f693          	andi	a3,a5,3
+10100da0:	b7fd                	j	10100d8e <memcpy+0x46>
+10100da2:	ffc77693          	andi	a3,a4,-4
+10100da6:	fe068613          	addi	a2,a3,-32
+10100daa:	06c7f563          	bgeu	a5,a2,10100e14 <memcpy+0xcc>
+10100dae:	1171                	addi	sp,sp,-4
+10100db0:	c022                	sw	s0,0(sp)
+10100db2:	49c0                	lw	s0,20(a1)
+10100db4:	0005a303          	lw	t1,0(a1)
+10100db8:	0085a383          	lw	t2,8(a1)
+10100dbc:	cbc0                	sw	s0,20(a5)
+10100dbe:	4d80                	lw	s0,24(a1)
+10100dc0:	0067a023          	sw	t1,0(a5)
+10100dc4:	0045a303          	lw	t1,4(a1)
+10100dc8:	cf80                	sw	s0,24(a5)
+10100dca:	4dc0                	lw	s0,28(a1)
+10100dcc:	0067a223          	sw	t1,4(a5)
+10100dd0:	00c5a283          	lw	t0,12(a1)
+10100dd4:	0105a303          	lw	t1,16(a1)
+10100dd8:	02458593          	addi	a1,a1,36
+10100ddc:	cfc0                	sw	s0,28(a5)
+10100dde:	ffc5a403          	lw	s0,-4(a1)
+10100de2:	0077a423          	sw	t2,8(a5)
+10100de6:	0057a623          	sw	t0,12(a5)
+10100dea:	0067a823          	sw	t1,16(a5)
+10100dee:	02478793          	addi	a5,a5,36
+10100df2:	fe87ae23          	sw	s0,-4(a5)
+10100df6:	fac7eee3          	bltu	a5,a2,10100db2 <memcpy+0x6a>
+10100dfa:	f8d7f2e3          	bgeu	a5,a3,10100d7e <memcpy+0x36>
+10100dfe:	4190                	lw	a2,0(a1)
+10100e00:	0791                	addi	a5,a5,4
+10100e02:	0591                	addi	a1,a1,4
+10100e04:	fec7ae23          	sw	a2,-4(a5)
+10100e08:	bfcd                	j	10100dfa <memcpy+0xb2>
+10100e0a:	4190                	lw	a2,0(a1)
+10100e0c:	0791                	addi	a5,a5,4
+10100e0e:	0591                	addi	a1,a1,4
+10100e10:	fec7ae23          	sw	a2,-4(a5)
+10100e14:	fed7ebe3          	bltu	a5,a3,10100e0a <memcpy+0xc2>
+10100e18:	f4e7e4e3          	bltu	a5,a4,10100d60 <memcpy+0x18>
+10100e1c:	8082                	ret
+10100e1e:	8082                	ret
+
+10100e20 <memset>:
+10100e20:	433d                	li	t1,15
+10100e22:	872a                	mv	a4,a0
+10100e24:	02c37363          	bgeu	t1,a2,10100e4a <memset+0x2a>
+10100e28:	00f77793          	andi	a5,a4,15
+10100e2c:	efbd                	bnez	a5,10100eaa <memset+0x8a>
+10100e2e:	e5ad                	bnez	a1,10100e98 <memset+0x78>
+10100e30:	ff067693          	andi	a3,a2,-16
+10100e34:	8a3d                	andi	a2,a2,15
+10100e36:	96ba                	add	a3,a3,a4
+10100e38:	c30c                	sw	a1,0(a4)
+10100e3a:	c34c                	sw	a1,4(a4)
+10100e3c:	c70c                	sw	a1,8(a4)
+10100e3e:	c74c                	sw	a1,12(a4)
+10100e40:	0741                	addi	a4,a4,16
+10100e42:	fed76be3          	bltu	a4,a3,10100e38 <memset+0x18>
+10100e46:	e211                	bnez	a2,10100e4a <memset+0x2a>
+10100e48:	8082                	ret
+10100e4a:	40c306b3          	sub	a3,t1,a2
+10100e4e:	068a                	slli	a3,a3,0x2
+10100e50:	00000297          	auipc	t0,0x0
+10100e54:	9696                	add	a3,a3,t0
+10100e56:	00a68067          	jr	10(a3)
+10100e5a:	00b70723          	sb	a1,14(a4) # 4000100e <_sp+0x2000000e>
+10100e5e:	00b706a3          	sb	a1,13(a4)
+10100e62:	00b70623          	sb	a1,12(a4)
+10100e66:	00b705a3          	sb	a1,11(a4)
+10100e6a:	00b70523          	sb	a1,10(a4)
+10100e6e:	00b704a3          	sb	a1,9(a4)
+10100e72:	00b70423          	sb	a1,8(a4)
+10100e76:	00b703a3          	sb	a1,7(a4)
+10100e7a:	00b70323          	sb	a1,6(a4)
+10100e7e:	00b702a3          	sb	a1,5(a4)
+10100e82:	00b70223          	sb	a1,4(a4)
+10100e86:	00b701a3          	sb	a1,3(a4)
+10100e8a:	00b70123          	sb	a1,2(a4)
+10100e8e:	00b700a3          	sb	a1,1(a4)
+10100e92:	00b70023          	sb	a1,0(a4)
+10100e96:	8082                	ret
+10100e98:	0ff5f593          	andi	a1,a1,255
+10100e9c:	00859693          	slli	a3,a1,0x8
+10100ea0:	8dd5                	or	a1,a1,a3
+10100ea2:	01059693          	slli	a3,a1,0x10
+10100ea6:	8dd5                	or	a1,a1,a3
+10100ea8:	b761                	j	10100e30 <memset+0x10>
+10100eaa:	00279693          	slli	a3,a5,0x2
+10100eae:	00000297          	auipc	t0,0x0
+10100eb2:	9696                	add	a3,a3,t0
+10100eb4:	8286                	mv	t0,ra
+10100eb6:	fa8680e7          	jalr	-88(a3)
+10100eba:	8096                	mv	ra,t0
+10100ebc:	17c1                	addi	a5,a5,-16
+10100ebe:	8f1d                	sub	a4,a4,a5
+10100ec0:	963e                	add	a2,a2,a5
+10100ec2:	f8c374e3          	bgeu	t1,a2,10100e4a <memset+0x2a>
+10100ec6:	b7a5                	j	10100e2e <memset+0xe>
