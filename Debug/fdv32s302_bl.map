@@ -1750,7 +1750,7 @@ Discarded input sections
  .data          0x0000000000000000        0x0 ./FDV32S302/drivers/iom.o
  .bss           0x0000000000000000        0x0 ./FDV32S302/drivers/iom.o
  .text.IOM_Init
-                0x0000000000000000      0x15a ./FDV32S302/drivers/iom.o
+                0x0000000000000000      0x156 ./FDV32S302/drivers/iom.o
  .text.IOM_SetPinIntProperty
                 0x0000000000000000       0x3e ./FDV32S302/drivers/iom.o
  .text.IOM_SyncAPBCmd
