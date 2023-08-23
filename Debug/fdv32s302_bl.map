@@ -2304,7 +2304,7 @@ END GROUP
 .ialign         0x0000000010100060        0x0
                 [!provide]                        PROVIDE (_flash = .)
 
-.text           0x0000000010100060      0xe68
+.text           0x0000000010100060      0xebc
  *(.text.unlikely .text.unlikely.*)
  *(.text.startup .text.startup.*)
  .text.startup.main
@@ -2337,130 +2337,129 @@ END GROUP
                 0x00000000101005e6       0x34 ./src/kptl/kptl.o
                 0x00000000101005e6                kptl_frame_packet_begin
  .text.kptl_frame_packet_add
-                0x000000001010061a       0x4c ./src/kptl/kptl.o
+                0x000000001010061a       0x4e ./src/kptl/kptl.o
                 0x000000001010061a                kptl_frame_packet_add
  .text.kptl_frame_packet_final
-                0x0000000010100666       0x50 ./src/kptl/kptl.o
-                0x0000000010100666                kptl_frame_packet_final
+                0x0000000010100668       0x50 ./src/kptl/kptl.o
+                0x0000000010100668                kptl_frame_packet_final
  .text.kptl_create_cmd_packet
-                0x00000000101006b6       0x46 ./src/kptl/kptl.o
-                0x00000000101006b6                kptl_create_cmd_packet
+                0x00000000101006b8       0x46 ./src/kptl/kptl.o
+                0x00000000101006b8                kptl_create_cmd_packet
  .text.kptl_create_generic_resp_packet
-                0x00000000101006fc       0x20 ./src/kptl/kptl.o
-                0x00000000101006fc                kptl_create_generic_resp_packet
+                0x00000000101006fe       0x20 ./src/kptl/kptl.o
+                0x00000000101006fe                kptl_create_generic_resp_packet
  .text.kptl_create_property_resp_packet
-                0x000000001010071c       0x20 ./src/kptl/kptl.o
-                0x000000001010071c                kptl_create_property_resp_packet
+                0x000000001010071e       0x20 ./src/kptl/kptl.o
+                0x000000001010071e                kptl_create_property_resp_packet
  .text.kptl_frame_packet_get_size
-                0x000000001010073c       0x10 ./src/kptl/kptl.o
-                0x000000001010073c                kptl_frame_packet_get_size
+                0x000000001010073e       0x10 ./src/kptl/kptl.o
+                0x000000001010073e                kptl_frame_packet_get_size
  .text.kptl_decode_init
-                0x000000001010074c       0x24 ./src/kptl/kptl.o
-                0x000000001010074c                kptl_decode_init
+                0x000000001010074e       0x24 ./src/kptl/kptl.o
+                0x000000001010074e                kptl_decode_init
  .text.kptl_decode
-                0x0000000010100770      0x19a ./src/kptl/kptl.o
-                0x0000000010100770                kptl_decode
+                0x0000000010100772      0x19a ./src/kptl/kptl.o
+                0x0000000010100772                kptl_decode
  .text.mcuboot_send
-                0x000000001010090a       0x24 ./src/main.o
+                0x000000001010090c       0x80 ./src/main.o
  .text.mcuboot_complete
-                0x000000001010092e        0x2 ./src/main.o
+                0x000000001010098c        0x2 ./src/main.o
  .text.Jump_to_APP
-                0x0000000010100930       0x52 ./src/main.o
+                0x000000001010098e       0x52 ./src/main.o
  .text.mcuboot_jump
-                0x0000000010100982       0x10 ./src/main.o
+                0x00000000101009e0       0x10 ./src/main.o
  .text.memory_read
-                0x0000000010100992       0x14 ./src/main.o
-                0x0000000010100992                memory_read
+                0x00000000101009f0       0x14 ./src/main.o
+                0x00000000101009f0                memory_read
  .text.memory_write
-                0x00000000101009a6       0x3c ./src/main.o
+                0x0000000010100a04       0x3c ./src/main.o
  .text.memory_erase
-                0x00000000101009e2       0x2e ./src/main.o
+                0x0000000010100a40       0x2e ./src/main.o
  .text.TIM_ClkInit
-                0x0000000010100a10       0x4e ./src/main.o
-                0x0000000010100a10                TIM_ClkInit
+                0x0000000010100a6e       0x4e ./src/main.o
+                0x0000000010100a6e                TIM_ClkInit
  .text.Delay_Nus
-                0x0000000010100a5e       0x1a ./src/main.o
-                0x0000000010100a5e                Delay_Nus
+                0x0000000010100abc       0x1a ./src/main.o
+                0x0000000010100abc                Delay_Nus
  .text.mcuboot_reset
-                0x0000000010100a78       0x2e ./src/main.o
+                0x0000000010100ad6       0x2e ./src/main.o
  .text.UART_HalInit
-                0x0000000010100aa6       0x4a ./src/main.o
-                0x0000000010100aa6                UART_HalInit
+                0x0000000010100b04       0x46 ./src/main.o
+                0x0000000010100b04                UART_HalInit
  .text.FLASH_HalInit
-                0x0000000010100af0       0x46 ./src/main.o
-                0x0000000010100af0                FLASH_HalInit
+                0x0000000010100b4a       0x46 ./src/main.o
+                0x0000000010100b4a                FLASH_HalInit
  .text.TIMER2_IrqHandler
-                0x0000000010100b36       0x74 ./src/main.o
-                0x0000000010100b36                TIMER2_IrqHandler
- .text._exit    0x0000000010100baa        0x2 ./FDV32S302/stubs/_exit.o
-                0x0000000010100baa                _exit
- *fill*         0x0000000010100bac        0x0 
- .text.entry    0x0000000010100bac       0x40 ./FDV32S302/env/entry.o
-                0x0000000010100bac                trap_entry
+                0x0000000010100b90       0x6e ./src/main.o
+                0x0000000010100b90                TIMER2_IrqHandler
+ .text._exit    0x0000000010100bfe        0x2 ./FDV32S302/stubs/_exit.o
+                0x0000000010100bfe                _exit
+ .text.entry    0x0000000010100c00       0x40 ./FDV32S302/env/entry.o
+                0x0000000010100c00                trap_entry
  .text.handle_trap
-                0x0000000010100bec       0x40 ./FDV32S302/env/init.o
-                0x0000000010100bec                handle_trap
+                0x0000000010100c40       0x40 ./FDV32S302/env/init.o
+                0x0000000010100c40                handle_trap
  .text.SystemInit
-                0x0000000010100c2c       0x72 ./FDV32S302/env/system_phnx04.o
-                0x0000000010100c2c                SystemInit
+                0x0000000010100c80       0x72 ./FDV32S302/env/system_phnx04.o
+                0x0000000010100c80                SystemInit
  .text.EFC_GetEFCStatus
-                0x0000000010100c9e       0x16 ./FDV32S302/drivers/efc.o
-                0x0000000010100c9e                EFC_GetEFCStatus
+                0x0000000010100cf2       0x16 ./FDV32S302/drivers/efc.o
+                0x0000000010100cf2                EFC_GetEFCStatus
  .text.EFC_SingleProgram
-                0x0000000010100cb4       0x3e ./FDV32S302/drivers/efc.o
-                0x0000000010100cb4                EFC_SingleProgram
+                0x0000000010100d08       0x3e ./FDV32S302/drivers/efc.o
+                0x0000000010100d08                EFC_SingleProgram
  .text.EFC_PageErase
-                0x0000000010100cf2       0x26 ./FDV32S302/drivers/efc.o
-                0x0000000010100cf2                EFC_PageErase
- .text.exit     0x0000000010100d18       0x30 d:/eclipse_for_s_link/toolchain/gcc/bin/../lib/gcc/riscv-none-embed/8.2.0/../../../../riscv-none-embed/lib/rv32emac/ilp32e\libg_nano.a(lib_a-exit.o)
-                0x0000000010100d18                exit
- .text.memcpy   0x0000000010100d48       0xd8 d:/eclipse_for_s_link/toolchain/gcc/bin/../lib/gcc/riscv-none-embed/8.2.0/../../../../riscv-none-embed/lib/rv32emac/ilp32e\libg_nano.a(lib_a-memcpy.o)
-                0x0000000010100d48                memcpy
- .text          0x0000000010100e20       0xa8 d:/eclipse_for_s_link/toolchain/gcc/bin/../lib/gcc/riscv-none-embed/8.2.0/../../../../riscv-none-embed/lib/rv32emac/ilp32e\libg_nano.a(lib_a-memset.o)
-                0x0000000010100e20                memset
+                0x0000000010100d46       0x26 ./FDV32S302/drivers/efc.o
+                0x0000000010100d46                EFC_PageErase
+ .text.exit     0x0000000010100d6c       0x30 d:/eclipse_for_s_link/toolchain/gcc/bin/../lib/gcc/riscv-none-embed/8.2.0/../../../../riscv-none-embed/lib/rv32emac/ilp32e\libg_nano.a(lib_a-exit.o)
+                0x0000000010100d6c                exit
+ .text.memcpy   0x0000000010100d9c       0xd8 d:/eclipse_for_s_link/toolchain/gcc/bin/../lib/gcc/riscv-none-embed/8.2.0/../../../../riscv-none-embed/lib/rv32emac/ilp32e\libg_nano.a(lib_a-memcpy.o)
+                0x0000000010100d9c                memcpy
+ .text          0x0000000010100e74       0xa8 d:/eclipse_for_s_link/toolchain/gcc/bin/../lib/gcc/riscv-none-embed/8.2.0/../../../../riscv-none-embed/lib/rv32emac/ilp32e\libg_nano.a(lib_a-memset.o)
+                0x0000000010100e74                memset
  *(.gnu.linkonce.t.*)
 
-.rdata          0x0000000010100ec8       0x68
+.rdata          0x0000000010100f1c       0x68
  *(.rdata)
  *(.rodata .rodata.*)
  .rodata.mcuboot_proc
-                0x0000000010100ec8       0x30 ./src/mcuboot/mcuboot.o
+                0x0000000010100f1c       0x30 ./src/mcuboot/mcuboot.o
  .rodata.kptl_decode
-                0x0000000010100ef8       0x38 ./src/kptl/kptl.o
+                0x0000000010100f4c       0x38 ./src/kptl/kptl.o
 
 .sdata2._global_impure_ptr
-                0x0000000010100f30        0x4
+                0x0000000010100f84        0x4
  .sdata2._global_impure_ptr
-                0x0000000010100f30        0x4 d:/eclipse_for_s_link/toolchain/gcc/bin/../lib/gcc/riscv-none-embed/8.2.0/../../../../riscv-none-embed/lib/rv32emac/ilp32e\libg_nano.a(lib_a-impure.o)
-                0x0000000010100f30                _global_impure_ptr
+                0x0000000010100f84        0x4 d:/eclipse_for_s_link/toolchain/gcc/bin/../lib/gcc/riscv-none-embed/8.2.0/../../../../riscv-none-embed/lib/rv32emac/ilp32e\libg_nano.a(lib_a-impure.o)
+                0x0000000010100f84                _global_impure_ptr
 
-.rela.dyn       0x0000000010100f34        0x0
- .rela.init     0x0000000010100f34        0x0 ./src/mcuboot/mcuboot.o
+.rela.dyn       0x0000000010100f88        0x0
+ .rela.init     0x0000000010100f88        0x0 ./src/mcuboot/mcuboot.o
  .rela.text.exit
-                0x0000000010100f34        0x0 ./src/mcuboot/mcuboot.o
+                0x0000000010100f88        0x0 ./src/mcuboot/mcuboot.o
  .rela.data.impure_data
-                0x0000000010100f34        0x0 ./src/mcuboot/mcuboot.o
+                0x0000000010100f88        0x0 ./src/mcuboot/mcuboot.o
 
 .fini
  *(SORT_NONE(.fini))
-                0x0000000010100f34                . = ALIGN (0x4)
+                0x0000000010100f88                . = ALIGN (0x4)
                 [!provide]                        PROVIDE (__etext = .)
                 [!provide]                        PROVIDE (_etext = .)
                 [!provide]                        PROVIDE (etext = .)
                 [!provide]                        PROVIDE (_eflash = .)
 
-.preinit_array  0x0000000010100f34        0x0
+.preinit_array  0x0000000010100f88        0x0
                 [!provide]                        PROVIDE (__preinit_array_start = .)
  *(.preinit_array)
                 [!provide]                        PROVIDE (__preinit_array_end = .)
 
-.init_array     0x0000000010100f34        0x0
+.init_array     0x0000000010100f88        0x0
                 [!provide]                        PROVIDE (__init_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*))
  *(.init_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .ctors)
                 [!provide]                        PROVIDE (__init_array_end = .)
 
-.fini_array     0x0000000010100f34        0x0
+.fini_array     0x0000000010100f88        0x0
                 [!provide]                        PROVIDE (__fini_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*))
  *(.fini_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .dtors)
@@ -2479,18 +2478,18 @@ END GROUP
  *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
  *(SORT_BY_NAME(.dtors.*))
  *(.dtors)
-                0x0000000010100f34                . = ALIGN (0x4)
+                0x0000000010100f88                . = ALIGN (0x4)
                 [!provide]                        PROVIDE (_eflash = .)
 
-.lalign         0x0000000010100f34        0x0
-                0x0000000010100f34                . = ALIGN (0x4)
-                0x0000000010100f34                PROVIDE (_data_lma = .)
+.lalign         0x0000000010100f88        0x0
+                0x0000000010100f88                . = ALIGN (0x4)
+                0x0000000010100f88                PROVIDE (_data_lma = .)
 
-.dalign         0x0000000020000000        0x0 load address 0x0000000010100f34
+.dalign         0x0000000020000000        0x0 load address 0x0000000010100f88
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_data = .)
 
-.data           0x0000000020000000       0x68 load address 0x0000000010100f34
+.data           0x0000000020000000       0x68 load address 0x0000000010100f88
  *(sram)
  *(.gnu.linkonce.r.*)
  *(.data .data.*)
@@ -2563,13 +2562,13 @@ OUTPUT(fdv32s302_bl.elf elf32-littleriscv)
  .debug_abbrev  0x0000000000000e30      0x12c ./FDV32S302/env/system_phnx04.o
  .debug_abbrev  0x0000000000000f5c      0x258 ./FDV32S302/drivers/efc.o
 
-.debug_loc      0x0000000000000000     0x116a
+.debug_loc      0x0000000000000000     0x1185
  .debug_loc     0x0000000000000000      0x333 ./src/mcuboot/mcuboot.o
  .debug_loc     0x0000000000000333      0x70e ./src/kptl/kptl.o
- .debug_loc     0x0000000000000a41      0x365 ./src/main.o
- .debug_loc     0x0000000000000da6       0x72 ./FDV32S302/env/init.o
- .debug_loc     0x0000000000000e18       0x96 ./FDV32S302/env/system_phnx04.o
- .debug_loc     0x0000000000000eae      0x2bc ./FDV32S302/drivers/efc.o
+ .debug_loc     0x0000000000000a41      0x380 ./src/main.o
+ .debug_loc     0x0000000000000dc1       0x72 ./FDV32S302/env/init.o
+ .debug_loc     0x0000000000000e33       0x96 ./FDV32S302/env/system_phnx04.o
+ .debug_loc     0x0000000000000ec9      0x2bc ./FDV32S302/drivers/efc.o
 
 .debug_aranges  0x0000000000000000      0x290
  .debug_aranges
@@ -2681,16 +2680,16 @@ OUTPUT(fdv32s302_bl.elf elf32-littleriscv)
  .debug_macro   0x0000000000005f99       0x50 ./FDV32S302/drivers/efc.o
  .debug_macro   0x0000000000005fe9      0x20b ./FDV32S302/drivers/efc.o
 
-.debug_line     0x0000000000000000     0x4012
+.debug_line     0x0000000000000000     0x40ec
  .debug_line    0x0000000000000000      0xa0d ./src/mcuboot/mcuboot.o
  .debug_line    0x0000000000000a0d      0xf87 ./src/kptl/kptl.o
- .debug_line    0x0000000000001994      0xf05 ./src/main.o
- .debug_line    0x0000000000002899      0x453 ./FDV32S302/stubs/_exit.o
- .debug_line    0x0000000000002cec       0x6d ./FDV32S302/env/entry.o
- .debug_line    0x0000000000002d59      0x154 ./FDV32S302/env/init.o
- .debug_line    0x0000000000002ead       0xd1 ./FDV32S302/env/start.o
- .debug_line    0x0000000000002f7e      0x389 ./FDV32S302/env/system_phnx04.o
- .debug_line    0x0000000000003307      0xd0b ./FDV32S302/drivers/efc.o
+ .debug_line    0x0000000000001994      0xfdf ./src/main.o
+ .debug_line    0x0000000000002973      0x453 ./FDV32S302/stubs/_exit.o
+ .debug_line    0x0000000000002dc6       0x6d ./FDV32S302/env/entry.o
+ .debug_line    0x0000000000002e33      0x154 ./FDV32S302/env/init.o
+ .debug_line    0x0000000000002f87       0xd1 ./FDV32S302/env/start.o
+ .debug_line    0x0000000000003058      0x389 ./FDV32S302/env/system_phnx04.o
+ .debug_line    0x00000000000033e1      0xd0b ./FDV32S302/drivers/efc.o
 
 .debug_str      0x0000000000000000    0x167e0
  .debug_str     0x0000000000000000     0x67e4 ./src/mcuboot/mcuboot.o

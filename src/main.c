@@ -53,8 +53,8 @@ void UART_HalInit(void)
 {
 	// 配置GP14, GP15复用为UART1
 	IOM->ADS   = 0x00000000;
-	IOM->AF0   = 0x5000CA00;
-	IOM->AF1   = 0x000000C0;
+	IOM->AF0   = 0x10000200;
+	IOM->AF1   = 0x00000000;
 	IOM->OE    = 0x00000000;
 	IOM->PU    = 0x00000000;
 	IOM->PD    = 0x00000000;
@@ -115,6 +115,34 @@ int memory_read(uint32_t addr, uint8_t *buf, uint32_t len)
 
 static int mcuboot_send(uint8_t *buf, uint32_t len)
 {
+	// 发送数据前打开TX复用
+	if(UARTx == UART1)
+	{
+		if(IOM->AF0 == 0x10000200)					// GP14, GP15
+		{
+			IOM->AF0 = 0x50000000;
+			IOM->AF1 = 0x00000000;
+		}
+		else if(IOM->AF0 == 0x00003000)				// GP18, GP19
+		{
+			IOM->AF0 = 0x00000000;
+			IOM->AF1 = 0x000000F0;
+		}
+	}
+	else
+	{
+		if(IOM->AF0 == 0x10000200)					// GP04, GP05
+		{
+			IOM->AF0 = 0x00000A00;
+			IOM->AF1 = 0x00000000;
+		}
+		else if(IOM->AF0 == 0x00003000)				// GP06, GP07
+		{
+			IOM->AF0 = 0x0000F000;
+			IOM->AF1 = 0x00000000;
+		}
+	}
+
     while(len--)
     {
     	UARTx->SBUF = *buf++;
@@ -289,8 +317,8 @@ void TIMER2_IrqHandler(void)
     timeout++;
 	if(timeout == 2 && !mcuboot.is_connected)			// 200ms后切换复用端口检测
 	{
-		IOM->AF0 = 0x4000F800;
-		IOM->AF1 = 0x000000F0;
+		IOM->AF0 = 0x00003000;
+		IOM->AF1 = 0x00000030;
 	}
 }
 
