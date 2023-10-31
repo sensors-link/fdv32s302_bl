@@ -60,59 +60,19 @@ extern void trap_entry();
   */
 void SystemInit(void)
 {
-	unsigned int tmpreg;
+	// 打开模块时钟门控
+	SYSC->CLKENCFG = 0x00005cf9;
 
-	/* Check the selection of the source clock */
-#if (SYSC_CLK_SRC_SEL == F_LRC)
-	/* Turn on ANAC clocks */
-	SYSC->CLKENCFG |= SYSC_CLKENCFG_ANAC;
-
-	/* Enable low-speed crystal oscillator LRC */
+	// 时钟源配置
 	ANAC->WPROT = ANAC_WPROT_V0;
 	ANAC->WPROT = ANAC_WPROT_V1;
-	ANAC->CLK_CFG |= ANAC_CLK_CFG_LRC_EN;
+	ANAC->CLK_CFG = 0x00000013;
 
-	/* Calculate and configure the system clock source and bus divider value */
-	tmpreg = SYSC->CLKCTRCFG;
-	tmpreg &= ~(SYSC_CLKCTRCFG_APB_CLK_DIV | SYSC_CLKCTRCFG_AHB_CLK_DIV | SYSC_CLKCTRCFG_SYS_CLK_SEL);
-	tmpreg |= ((SYSC_AHB_DIV << SYSC_CLKCTRCFG_AHB_CLK_DIV_pos) | (SYSC_APB_DIV << SYSC_CLKCTRCFG_APB_CLK_DIV_pos) |
-			   SYSC_CLKCTRCFG_SYS_CLK_SEL_LRC);
-
-	/* The system clock source and bus divider value are written to the register */
+	// 系统时钟配置
 	SYSC->WRPROCFG	= SYSC_WRPROCFG_V0;
 	SYSC->WRPROCFG	= SYSC_WRPROCFG_V1;
-	SYSC->CLKCTRCFG = tmpreg;
-#else
-	/* Turn on ANAC clocks */
-	SYSC->CLKENCFG |= SYSC_CLKENCFG_ANAC;
-
-	/* Enable main frequency oscillator HRC */
-	ANAC->WPROT = ANAC_WPROT_V0;
-	ANAC->WPROT = ANAC_WPROT_V1;
-	ANAC->CLK_CFG |= ANAC_CLK_CFG_HRC_EN;
-
-	/* Calculate high-speed crystal oscillator frequency gear */
-	tmpreg = ANAC->CLK_CFG;
-	tmpreg &= ~ANAC_CLK_CFG_HRC_FSEL;
-	tmpreg |= SYSC_CLK_SRC_SEL << ANAC_CLK_CFG_HRC_FSEL_pos;
-
-	/* The high-speed crystal oscillator frequency gear value is written into the register */
-	ANAC->WPROT	  = ANAC_WPROT_V0;
-	ANAC->WPROT	  = ANAC_WPROT_V1;
-	ANAC->CLK_CFG = tmpreg;
-
-	/* Calculate and configure the system clock source and bus divider value */
-	tmpreg = SYSC->CLKCTRCFG;
-	tmpreg &= ~(SYSC_CLKCTRCFG_APB_CLK_DIV | SYSC_CLKCTRCFG_AHB_CLK_DIV | SYSC_CLKCTRCFG_SYS_CLK_SEL);
-	tmpreg |= ((SYSC_AHB_DIV << SYSC_CLKCTRCFG_AHB_CLK_DIV_pos) | (SYSC_APB_DIV << SYSC_CLKCTRCFG_APB_CLK_DIV_pos) |
-			   SYSC_CLKCTRCFG_SYS_CLK_SEL_HRC);
-
-	/* The system clock source and bus divider value are written to the register */
-	SYSC->WRPROCFG	= SYSC_WRPROCFG_V0;
-	SYSC->WRPROCFG	= SYSC_WRPROCFG_V1;
-	SYSC->CLKCTRCFG = tmpreg;
-#endif
-
+	SYSC->CLKCTRCFG = 0x00000000;
+	
 	/* Update system clock frequency variable */
 //	SystemCoreClockUpdate();
 

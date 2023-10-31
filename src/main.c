@@ -22,9 +22,6 @@ volatile UART_TypeDef *UARTx = UART1;
 
 void TIM_ClkInit(void)
 {
-	// 打开模块时钟门控
-	SYSC->CLKENCFG = 0x00005cf9;
-
 	// 设置TIM时钟分频，TIM1_CLK=1MHz, TIM2_CLK=1MHz
 	SYSC->TIMCLKDIV = 0x00000707;
 
@@ -94,7 +91,12 @@ static int memory_erase(uint32_t start_addr, uint32_t byte_cnt)
     while(addr < (byte_cnt + start_addr))
     {
         EFC_PageErase(addr);
-        addr += 512;
+		if(((addr) >= 0x10100000) && ((addr) < 0x10108000))
+        	addr += 512;
+		else if(((addr) >= 0x10140000) && ((addr) < 0x10140400))
+			addr += 128;
+		else
+			addr += 8;
     }
     return 0;
 }

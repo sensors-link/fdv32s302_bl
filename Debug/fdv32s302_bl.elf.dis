@@ -27,7 +27,7 @@ _start:
 	/* Load data section */
 	la a0, _data_lma
 10100014:	00001517          	auipc	a0,0x1
-10100018:	f7450513          	addi	a0,a0,-140 # 10100f88 <_data_lma>
+10100018:	f6c50513          	addi	a0,a0,-148 # 10100f80 <_data_lma>
 	la a1, _data
 1010001c:	ba018593          	addi	a1,gp,-1120 # 20000000 <_data>
 	la a2, _edata
@@ -63,7 +63,7 @@ _start:
 2:
 
 	call SystemInit
-1010004e:	433000ef          	jal	ra,10100c80 <SystemInit>
+1010004e:	44f000ef          	jal	ra,10100c9c <SystemInit>
 	csrs mstatus, t0
 	csrw fcsr, x0
 #endif
@@ -76,7 +76,7 @@ _start:
 	call main
 10100056:	2029                	jal	10100060 <main>
 	tail exit
-10100058:	5150006f          	j	10100d6c <exit>
+10100058:	50b0006f          	j	10100d62 <exit>
 
 1:
 	j 1b
@@ -98,11 +98,11 @@ int main(void)
 	uint8_t c;
 
 	TIM_ClkInit();
-10100068:	207000ef          	jal	ra,10100a6e <TIM_ClkInit>
+10100068:	22b000ef          	jal	ra,10100a92 <TIM_ClkInit>
 	UART_HalInit();
-1010006c:	299000ef          	jal	ra,10100b04 <UART_HalInit>
+1010006c:	2b5000ef          	jal	ra,10100b20 <UART_HalInit>
 	FLASH_HalInit();
-10100070:	2db000ef          	jal	ra,10100b4a <FLASH_HalInit>
+10100070:	2f7000ef          	jal	ra,10100b66 <FLASH_HalInit>
 
 	/* config the mcuboot */
 	mcuboot.op_send = mcuboot_send;
@@ -111,7 +111,7 @@ int main(void)
 1010007c:	caf1aa23          	sw	a5,-844(gp) # 20000114 <mcuboot+0xa0>
 	mcuboot.op_reset = mcuboot_reset;
 10100080:	00001797          	auipc	a5,0x1
-10100084:	a5678793          	addi	a5,a5,-1450 # 10100ad6 <mcuboot_reset>
+10100084:	a7278793          	addi	a5,a5,-1422 # 10100af2 <mcuboot_reset>
 10100088:	cef1a423          	sw	a5,-792(gp) # 20000148 <mcuboot+0xd4>
 	mcuboot.op_jump = mcuboot_jump;
 1010008c:	00001797          	auipc	a5,0x1
@@ -152,7 +152,7 @@ int main(void)
 101000e8:	ccf1a423          	sw	a5,-824(gp) # 20000128 <mcuboot+0xb4>
 	mcuboot.cfg_device_id = 0x12345678;
 101000ec:	123457b7          	lui	a5,0x12345
-101000f0:	67878793          	addi	a5,a5,1656 # 12345678 <_data_lma+0x22446f0>
+101000f0:	67878793          	addi	a5,a5,1656 # 12345678 <_data_lma+0x22446f8>
 101000f4:	ccf1a623          	sw	a5,-820(gp) # 2000012c <mcuboot+0xb8>
 	mcuboot.cfg_uuid = 0x87654321;
 101000f8:	876547b7          	lui	a5,0x87654
@@ -161,7 +161,7 @@ int main(void)
 
 	if(REG32(0x10140080) == 0x0FFAF005)
 10100104:	101407b7          	lui	a5,0x10140
-10100108:	0807a783          	lw	a5,128(a5) # 10140080 <_data_lma+0x3f0f8>
+10100108:	0807a783          	lw	a5,128(a5) # 10140080 <_data_lma+0x3f100>
 1010010c:	f0051737          	lui	a4,0xf0051
 10100110:	176d                	addi	a4,a4,-5
 10100112:	97ba                	add	a5,a5,a4
@@ -254,7 +254,7 @@ uint32_t mcuboot_is_connected(mcuboot_t *ctx)
 {
     return ctx->is_connected;
 }
-1010018c:	0ec52503          	lw	a0,236(a0) # 101010ec <_data_lma+0x164>
+1010018c:	0ec52503          	lw	a0,236(a0) # 101010ec <_data_lma+0x16c>
 10100190:	8082                	ret
 
 10100192 <mcuboot_proc>:
@@ -287,14 +287,14 @@ void mcuboot_proc(mcuboot_t *ctx)
 101001ca:	00850593          	addi	a1,a0,8
 101001ce:	4611                	li	a2,4
 101001d0:	0028                	addi	a0,sp,8
-101001d2:	3cb000ef          	jal	ra,10100d9c <memcpy>
+101001d2:	3c1000ef          	jal	ra,10100d92 <memcpy>
     memcpy(rx_param, &pkt->payload[4], rx_cp.param_cnt*sizeof(uint32_t));
 101001d6:	00b14603          	lbu	a2,11(sp)
 101001da:	107c                	addi	a5,sp,44
 101001dc:	00c40593          	addi	a1,s0,12
 101001e0:	060a                	slli	a2,a2,0x2
 101001e2:	853e                	mv	a0,a5
-101001e4:	3b9000ef          	jal	ra,10100d9c <memcpy>
+101001e4:	3af000ef          	jal	ra,10100d92 <memcpy>
     rx_cp.param = rx_param;
 101001e8:	c62a                	sw	a0,12(sp)
     kptl_create_ack(&ack);
@@ -312,7 +312,7 @@ void mcuboot_proc(mcuboot_t *ctx)
 10100200:	0ff7f793          	andi	a5,a5,255
 10100204:	02f76763          	bltu	a4,a5,10100232 <mcuboot_proc+0xa0>
 10100208:	00001717          	auipc	a4,0x1
-1010020c:	d1470713          	addi	a4,a4,-748 # 10100f1c <memset+0xa8>
+1010020c:	d0c70713          	addi	a4,a4,-756 # 10100f14 <memset+0xaa>
 10100210:	078a                	slli	a5,a5,0x2
 10100212:	97ba                	add	a5,a5,a4
 10100214:	439c                	lw	a5,0(a5)
@@ -601,14 +601,14 @@ void mcuboot_proc(mcuboot_t *ctx)
 10100430:	0cc42703          	lw	a4,204(s0)
 10100434:	101407b7          	lui	a5,0x10140
 10100438:	08000593          	li	a1,128
-1010043c:	08078513          	addi	a0,a5,128 # 10140080 <_data_lma+0x3f0f8>
+1010043c:	08078513          	addi	a0,a5,128 # 10140080 <_data_lma+0x3f100>
 10100440:	9702                	jalr	a4
 						ctx->op_mem_write(0x10140080, (uint8_t *)&encrypt_data, 4);
 10100442:	0c842703          	lw	a4,200(s0)
 10100446:	101407b7          	lui	a5,0x10140
 1010044a:	4611                	li	a2,4
 1010044c:	080c                	addi	a1,sp,16
-1010044e:	08078513          	addi	a0,a5,128 # 10140080 <_data_lma+0x3f0f8>
+1010044e:	08078513          	addi	a0,a5,128 # 10140080 <_data_lma+0x3f100>
 10100452:	9702                	jalr	a4
                     ctx->flash_encrypt = rx_cp.param[1];
 10100454:	0c942023          	sw	s1,192(s0)
@@ -625,7 +625,7 @@ void mcuboot_proc(mcuboot_t *ctx)
 1010046c:	9782                	jalr	a5
 1010046e:	b7c9                	j	10100430 <mcuboot_proc+0x29e>
                 len = ARRAY2INT16(ctx->rx_pkt.len);
-10100470:	00554483          	lbu	s1,5(a0) # 10101005 <_data_lma+0x7d>
+10100470:	00554483          	lbu	s1,5(a0) # 10101005 <_data_lma+0x85>
 10100474:	00454783          	lbu	a5,4(a0)
                 ctx->op_mem_write(ctx->mem_cur_addr, ctx->rx_pkt.payload, len);
 10100478:	00850593          	addi	a1,a0,8
@@ -895,7 +895,7 @@ uint32_t kptl_frame_packet_begin(frame_packet_t *p, uint8_t frame_type)
 10100606:	04000613          	li	a2,64
 1010060a:	4581                	li	a1,0
 1010060c:	0519                	addi	a0,a0,6
-1010060e:	067000ef          	jal	ra,10100e74 <memset>
+1010060e:	05d000ef          	jal	ra,10100e6a <memset>
     return CH_OK;
 }
 10100612:	40a2                	lw	ra,8(sp)
@@ -931,7 +931,7 @@ uint32_t kptl_frame_packet_add(frame_packet_t *p, uint8_t *buf, uint16_t len)
 1010063a:	c406                	sw	ra,8(sp)
 1010063c:	84b2                	mv	s1,a2
     memcpy(p->payload + ARRAY2INT16(p->len), buf, len);
-1010063e:	75e000ef          	jal	ra,10100d9c <memcpy>
+1010063e:	754000ef          	jal	ra,10100d92 <memcpy>
     p->len[0] += (len >>0) & 0xFF;
 10100642:	00244783          	lbu	a5,2(s0)
     p->len[1] += (len >>8) & 0xFF;
@@ -1142,7 +1142,7 @@ int kptl_decode_init(pkt_dec_t *d)
 {
 10100762:	c406                	sw	ra,8(sp)
     memset(d->fp, 0, sizeof(frame_packet_t));
-10100764:	2f01                	jal	10100e74 <memset>
+10100764:	2719                	jal	10100e6a <memset>
     return 0;
 }
 10100766:	40a2                	lw	ra,8(sp)
@@ -1183,7 +1183,7 @@ uint32_t kptl_decode(pkt_dec_t *d, uint8_t c)
     switch(d->status)
 10100786:	18f76063          	bltu	a4,a5,10100906 <kptl_decode+0x194>
 1010078a:	00000717          	auipc	a4,0x0
-1010078e:	7c270713          	addi	a4,a4,1986 # 10100f4c <memset+0xd8>
+1010078e:	7ba70713          	addi	a4,a4,1978 # 10100f44 <memset+0xda>
 10100792:	078a                	slli	a5,a5,0x2
 10100794:	97ba                	add	a5,a5,a4
 10100796:	439c                	lw	a5,0(a5)
@@ -1219,7 +1219,7 @@ uint32_t kptl_decode(pkt_dec_t *d, uint8_t c)
 101007c0:	4799                	li	a5,6
 101007c2:	00b7ee63          	bltu	a5,a1,101007de <kptl_decode+0x6c>
 101007c6:	00000717          	auipc	a4,0x0
-101007ca:	7a270713          	addi	a4,a4,1954 # 10100f68 <memset+0xf4>
+101007ca:	79a70713          	addi	a4,a4,1946 # 10100f60 <memset+0xf6>
 101007ce:	058a                	slli	a1,a1,0x2
 101007d0:	95ba                	add	a1,a1,a4
 101007d2:	419c                	lw	a5,0(a1)
@@ -1519,7 +1519,7 @@ static void mcuboot_complete(void) { }
 {
 101009f8:	c406                	sw	ra,8(sp)
     memcpy(buf, (void*)addr, len);
-101009fa:	264d                	jal	10100d9c <memcpy>
+101009fa:	2e61                	jal	10100d92 <memcpy>
 }
 101009fc:	40a2                	lw	ra,8(sp)
 101009fe:	4501                	li	a0,0
@@ -1552,7 +1552,7 @@ static void mcuboot_complete(void) { }
 10100a30:	4601                	li	a2,0
 10100a32:	c23e                	sw	a5,4(sp)
 10100a34:	c03a                	sw	a4,0(sp)
-10100a36:	2cc9                	jal	10100d08 <EFC_SingleProgram>
+10100a36:	24e1                	jal	10100cfe <EFC_SingleProgram>
 10100a38:	0405                	addi	s0,s0,1
 10100a3a:	4792                	lw	a5,4(sp)
 10100a3c:	4702                	lw	a4,0(sp)
@@ -1580,699 +1580,678 @@ static void mcuboot_complete(void) { }
         EFC_PageErase(addr);
 10100a60:	8522                	mv	a0,s0
 10100a62:	c02e                	sw	a1,0(sp)
-10100a64:	24cd                	jal	10100d46 <EFC_PageErase>
-        addr += 512;
-10100a66:	20040413          	addi	s0,s0,512
-10100a6a:	4582                	lw	a1,0(sp)
-10100a6c:	b7c5                	j	10100a4c <memory_erase+0xc>
+10100a64:	2ce1                	jal	10100d3c <EFC_PageErase>
+		if(((addr) >= 0x10100000) && ((addr) < 0x10108000))
+10100a66:	eff007b7          	lui	a5,0xeff00
+10100a6a:	97a2                	add	a5,a5,s0
+10100a6c:	6721                	lui	a4,0x8
+10100a6e:	4582                	lw	a1,0(sp)
+10100a70:	00e7f563          	bgeu	a5,a4,10100a7a <memory_erase+0x3a>
+        	addr += 512;
+10100a74:	20040413          	addi	s0,s0,512
+10100a78:	bfd1                	j	10100a4c <memory_erase+0xc>
+		else if(((addr) >= 0x10140000) && ((addr) < 0x10140400))
+10100a7a:	efec07b7          	lui	a5,0xefec0
+10100a7e:	97a2                	add	a5,a5,s0
+10100a80:	3ff00713          	li	a4,1023
+10100a84:	00f76563          	bltu	a4,a5,10100a8e <memory_erase+0x4e>
+			addr += 128;
+10100a88:	08040413          	addi	s0,s0,128
+10100a8c:	b7c1                	j	10100a4c <memory_erase+0xc>
+			addr += 8;
+10100a8e:	0421                	addi	s0,s0,8
+10100a90:	bf75                	j	10100a4c <memory_erase+0xc>
 
-10100a6e <TIM_ClkInit>:
-	SYSC->CLKENCFG = 0x00005cf9;
-10100a6e:	6799                	lui	a5,0x6
-10100a70:	40001737          	lui	a4,0x40001
-10100a74:	cf978793          	addi	a5,a5,-775 # 5cf9 <__stack_size+0x58f9>
-10100a78:	c71c                	sw	a5,8(a4)
+10100a92 <TIM_ClkInit>:
 	SYSC->TIMCLKDIV = 0x00000707;
-10100a7a:	70700793          	li	a5,1799
-10100a7e:	cf1c                	sw	a5,24(a4)
+10100a92:	400017b7          	lui	a5,0x40001
+10100a96:	70700713          	li	a4,1799
+10100a9a:	cf98                	sw	a4,24(a5)
 	TIM1->CTCG1 = 0x00000000;
-10100a80:	400107b7          	lui	a5,0x40010
-10100a84:	0007a023          	sw	zero,0(a5) # 40010000 <_sp+0x2000f000>
+10100a9c:	400107b7          	lui	a5,0x40010
+10100aa0:	0007a023          	sw	zero,0(a5) # 40010000 <_sp+0x2000f000>
 	TIM2->CTCG1 = 0x0000c34f;
-10100a88:	6731                	lui	a4,0xc
+10100aa4:	6731                	lui	a4,0xc
 	TIM1->CTCG2 = 0x00000000;
-10100a8a:	0007a223          	sw	zero,4(a5)
+10100aa6:	0007a223          	sw	zero,4(a5)
 	TIM2->CTCG1 = 0x0000c34f;
-10100a8e:	34f70713          	addi	a4,a4,847 # c34f <__stack_size+0xbf4f>
-10100a92:	cbd8                	sw	a4,20(a5)
+10100aaa:	34f70713          	addi	a4,a4,847 # c34f <__stack_size+0xbf4f>
+10100aae:	cbd8                	sw	a4,20(a5)
 	TIM2->CTCG2 = 0x00000000;
-10100a94:	0007ac23          	sw	zero,24(a5)
+10100ab0:	0007ac23          	sw	zero,24(a5)
 	PLIC_SetPriority(TIMER2_IRQn, 1);
-10100a98:	e0010737          	lui	a4,0xe0010
-10100a9c:	4685                	li	a3,1
-10100a9e:	cb14                	sw	a3,16(a4)
+10100ab4:	e0010737          	lui	a4,0xe0010
+10100ab8:	4685                	li	a3,1
+10100aba:	cb14                	sw	a3,16(a4)
 	PLIC_EnableIRQ(TIMER2_IRQn);
-10100aa0:	20072683          	lw	a3,512(a4) # e0010200 <_sp+0xc000f200>
-10100aa4:	0106e693          	ori	a3,a3,16
-10100aa8:	20d72023          	sw	a3,512(a4)
+10100abc:	20072683          	lw	a3,512(a4) # e0010200 <_sp+0xc000f200>
+10100ac0:	0106e693          	ori	a3,a3,16
+10100ac4:	20d72023          	sw	a3,512(a4)
 	TIMERS->INTCLR = TIM_INTCLR_TIM2;
-10100aac:	4689                	li	a3,2
-10100aae:	0ad7a423          	sw	a3,168(a5)
+10100ac8:	4689                	li	a3,2
+10100aca:	0ad7a423          	sw	a3,168(a5)
 	TIMERS->CON = 0x00000223;
-10100ab2:	22300713          	li	a4,547
-10100ab6:	0ae7a023          	sw	a4,160(a5)
+10100ace:	22300713          	li	a4,547
+10100ad2:	0ae7a023          	sw	a4,160(a5)
 }
-10100aba:	8082                	ret
+10100ad6:	8082                	ret
 
-10100abc <Delay_Nus>:
+10100ad8 <Delay_Nus>:
     u32 start = TIM1->CTVAL;
-10100abc:	400107b7          	lui	a5,0x40010
-10100ac0:	4798                	lw	a4,8(a5)
+10100ad8:	400107b7          	lui	a5,0x40010
+10100adc:	4798                	lw	a4,8(a5)
     while((start -(u32)TIM1->CTVAL) < delay) __asm("NOP");
-10100ac2:	400107b7          	lui	a5,0x40010
-10100ac6:	479c                	lw	a5,8(a5)
-10100ac8:	40f707b3          	sub	a5,a4,a5
-10100acc:	00a7e363          	bltu	a5,a0,10100ad2 <Delay_Nus+0x16>
+10100ade:	400107b7          	lui	a5,0x40010
+10100ae2:	479c                	lw	a5,8(a5)
+10100ae4:	40f707b3          	sub	a5,a4,a5
+10100ae8:	00a7e363          	bltu	a5,a0,10100aee <Delay_Nus+0x16>
 }
-10100ad0:	8082                	ret
+10100aec:	8082                	ret
     while((start -(u32)TIM1->CTVAL) < delay) __asm("NOP");
-10100ad2:	0001                	nop
-10100ad4:	b7fd                	j	10100ac2 <Delay_Nus+0x6>
+10100aee:	0001                	nop
+10100af0:	b7fd                	j	10100ade <Delay_Nus+0x6>
 
-10100ad6 <mcuboot_reset>:
+10100af2 <mcuboot_reset>:
     Delay_Nus(200000);
-10100ad6:	00031537          	lui	a0,0x31
+10100af2:	00031537          	lui	a0,0x31
 {
-10100ada:	1151                	addi	sp,sp,-12
+10100af6:	1151                	addi	sp,sp,-12
     Delay_Nus(200000);
-10100adc:	d4050513          	addi	a0,a0,-704 # 30d40 <__stack_size+0x30940>
+10100af8:	d4050513          	addi	a0,a0,-704 # 30d40 <__stack_size+0x30940>
 {
-10100ae0:	c406                	sw	ra,8(sp)
+10100afc:	c406                	sw	ra,8(sp)
     Delay_Nus(200000);
-10100ae2:	3fe9                	jal	10100abc <Delay_Nus>
+10100afe:	3fe9                	jal	10100ad8 <Delay_Nus>
 	SYSC_WPT_UNLOCK();
-10100ae4:	6719                	lui	a4,0x6
-10100ae6:	400017b7          	lui	a5,0x40001
-10100aea:	a5a70713          	addi	a4,a4,-1446 # 5a5a <__stack_size+0x565a>
-10100aee:	c3d8                	sw	a4,4(a5)
-10100af0:	6729                	lui	a4,0xa
-10100af2:	5a570713          	addi	a4,a4,1445 # a5a5 <__stack_size+0xa1a5>
+10100b00:	6719                	lui	a4,0x6
+10100b02:	400017b7          	lui	a5,0x40001
+10100b06:	a5a70713          	addi	a4,a4,-1446 # 5a5a <__stack_size+0x565a>
+10100b0a:	c3d8                	sw	a4,4(a5)
+10100b0c:	6729                	lui	a4,0xa
+10100b0e:	5a570713          	addi	a4,a4,1445 # a5a5 <__stack_size+0xa1a5>
 }
-10100af6:	40a2                	lw	ra,8(sp)
+10100b12:	40a2                	lw	ra,8(sp)
 	SYSC_WPT_UNLOCK();
-10100af8:	c3d8                	sw	a4,4(a5)
+10100b14:	c3d8                	sw	a4,4(a5)
     SYSC->MSFTRSTCFG = SYSC_MSFTRSTCFG_DIG;
-10100afa:	20000713          	li	a4,512
-10100afe:	c7d8                	sw	a4,12(a5)
+10100b16:	20000713          	li	a4,512
+10100b1a:	c7d8                	sw	a4,12(a5)
 }
-10100b00:	0131                	addi	sp,sp,12
-10100b02:	8082                	ret
+10100b1c:	0131                	addi	sp,sp,12
+10100b1e:	8082                	ret
 
-10100b04 <UART_HalInit>:
+10100b20 <UART_HalInit>:
 	IOM->ADS   = 0x00000000;
-10100b04:	400127b7          	lui	a5,0x40012
+10100b20:	400127b7          	lui	a5,0x40012
 	IOM->AF0   = 0x10000200;
-10100b08:	10000737          	lui	a4,0x10000
+10100b24:	10000737          	lui	a4,0x10000
 	IOM->ADS   = 0x00000000;
-10100b0c:	4007aa23          	sw	zero,1044(a5) # 40012414 <_sp+0x20011414>
+10100b28:	4007aa23          	sw	zero,1044(a5) # 40012414 <_sp+0x20011414>
 	IOM->AF0   = 0x10000200;
-10100b10:	20070713          	addi	a4,a4,512 # 10000200 <__stack_size+0xffffe00>
-10100b14:	40e7ae23          	sw	a4,1052(a5)
+10100b2c:	20070713          	addi	a4,a4,512 # 10000200 <__stack_size+0xffffe00>
+10100b30:	40e7ae23          	sw	a4,1052(a5)
 	IOM->AF1   = 0x00000000;
-10100b18:	4207a023          	sw	zero,1056(a5)
+10100b34:	4207a023          	sw	zero,1056(a5)
 	IOM->OE    = 0x00000000;
-10100b1c:	4007a223          	sw	zero,1028(a5)
+10100b38:	4007a223          	sw	zero,1028(a5)
 	IOM->PU    = 0x00000000;
-10100b20:	4007a423          	sw	zero,1032(a5)
+10100b3c:	4007a423          	sw	zero,1032(a5)
 	IOM->PD    = 0x00000000;
-10100b24:	4007a623          	sw	zero,1036(a5)
+10100b40:	4007a623          	sw	zero,1036(a5)
 	IOM->OTYPE = 0x00000000;
-10100b28:	4007a823          	sw	zero,1040(a5)
+10100b44:	4007a823          	sw	zero,1040(a5)
 	IOM->DRS   = 0x00000000;
-10100b2c:	4007ac23          	sw	zero,1048(a5)
+10100b48:	4007ac23          	sw	zero,1048(a5)
 	UART1->SCON = 0x00000140;
-10100b30:	14000693          	li	a3,320
-10100b34:	400117b7          	lui	a5,0x40011
-10100b38:	c394                	sw	a3,0(a5)
+10100b4c:	14000693          	li	a3,320
+10100b50:	400117b7          	lui	a5,0x40011
+10100b54:	c394                	sw	a3,0(a5)
 	UART1->BDIV = 0x00000115;
-10100b3a:	11500713          	li	a4,277
-10100b3e:	cbd8                	sw	a4,20(a5)
+10100b56:	11500713          	li	a4,277
+10100b5a:	cbd8                	sw	a4,20(a5)
 	UART2->SCON = 0x00000140;
-10100b40:	c0d7a023          	sw	a3,-1024(a5) # 40010c00 <_sp+0x2000fc00>
+10100b5c:	c0d7a023          	sw	a3,-1024(a5) # 40010c00 <_sp+0x2000fc00>
 	UART2->BDIV = 0x00000115;
-10100b44:	c0e7aa23          	sw	a4,-1004(a5)
+10100b60:	c0e7aa23          	sw	a4,-1004(a5)
 }
-10100b48:	8082                	ret
+10100b64:	8082                	ret
 
-10100b4a <FLASH_HalInit>:
+10100b66 <FLASH_HalInit>:
 	EFC_WPT_UNLOCK();
-10100b4a:	400007b7          	lui	a5,0x40000
-10100b4e:	0c300693          	li	a3,195
-10100b52:	cf94                	sw	a3,24(a5)
-10100b54:	03c00713          	li	a4,60
-10100b58:	cf98                	sw	a4,24(a5)
-	EFC->CR    = 0xf9c39000;
-10100b5a:	f9c39637          	lui	a2,0xf9c39
-10100b5e:	c390                	sw	a2,0(a5)
-	EFC_WPT_UNLOCK();
-10100b60:	cf94                	sw	a3,24(a5)
-10100b62:	cf98                	sw	a4,24(a5)
-	EFC->TNVS  = 0x0000000e;
-10100b64:	4639                	li	a2,14
-10100b66:	c3d0                	sw	a2,4(a5)
-	EFC_WPT_UNLOCK();
-10100b68:	cf94                	sw	a3,24(a5)
-10100b6a:	cf98                	sw	a4,24(a5)
-	EFC->TPROG = 0x0000000e;
-10100b6c:	c790                	sw	a2,8(a5)
-	EFC_WPT_UNLOCK();
+10100b66:	400007b7          	lui	a5,0x40000
+10100b6a:	0c300693          	li	a3,195
 10100b6e:	cf94                	sw	a3,24(a5)
-10100b70:	cf98                	sw	a4,24(a5)
-	EFC->TPGS  = 0x0000000c;
-10100b72:	4631                	li	a2,12
-10100b74:	c7d0                	sw	a2,12(a5)
+10100b70:	03c00713          	li	a4,60
+10100b74:	cf98                	sw	a4,24(a5)
+	EFC->CR    = 0xf9c39000;
+10100b76:	f9c39637          	lui	a2,0xf9c39
+10100b7a:	c390                	sw	a2,0(a5)
 	EFC_WPT_UNLOCK();
-10100b76:	cf94                	sw	a3,24(a5)
-	EFC->TRCV  = 0x000cf1e0;
-10100b78:	000cf637          	lui	a2,0xcf
-	EFC_WPT_UNLOCK();
-10100b7c:	cf98                	sw	a4,24(a5)
-	EFC->TRCV  = 0x000cf1e0;
-10100b7e:	1e060613          	addi	a2,a2,480 # cf1e0 <__stack_size+0xcede0>
-10100b82:	cb90                	sw	a2,16(a5)
+10100b7c:	cf94                	sw	a3,24(a5)
+10100b7e:	cf98                	sw	a4,24(a5)
+	EFC->TNVS  = 0x0000000e;
+10100b80:	4639                	li	a2,14
+10100b82:	c3d0                	sw	a2,4(a5)
 	EFC_WPT_UNLOCK();
 10100b84:	cf94                	sw	a3,24(a5)
 10100b86:	cf98                	sw	a4,24(a5)
+	EFC->TPROG = 0x0000000e;
+10100b88:	c790                	sw	a2,8(a5)
+	EFC_WPT_UNLOCK();
+10100b8a:	cf94                	sw	a3,24(a5)
+10100b8c:	cf98                	sw	a4,24(a5)
+	EFC->TPGS  = 0x0000000c;
+10100b8e:	4631                	li	a2,12
+10100b90:	c7d0                	sw	a2,12(a5)
+	EFC_WPT_UNLOCK();
+10100b92:	cf94                	sw	a3,24(a5)
+	EFC->TRCV  = 0x000cf1e0;
+10100b94:	000cf637          	lui	a2,0xcf
+	EFC_WPT_UNLOCK();
+10100b98:	cf98                	sw	a4,24(a5)
+	EFC->TRCV  = 0x000cf1e0;
+10100b9a:	1e060613          	addi	a2,a2,480 # cf1e0 <__stack_size+0xcede0>
+10100b9e:	cb90                	sw	a2,16(a5)
+	EFC_WPT_UNLOCK();
+10100ba0:	cf94                	sw	a3,24(a5)
+10100ba2:	cf98                	sw	a4,24(a5)
 	EFC->TERS  = 0x000004c6;
-10100b88:	4c600713          	li	a4,1222
-10100b8c:	cbd8                	sw	a4,20(a5)
+10100ba4:	4c600713          	li	a4,1222
+10100ba8:	cbd8                	sw	a4,20(a5)
 }
-10100b8e:	8082                	ret
+10100baa:	8082                	ret
 
-10100b90 <TIMER2_IrqHandler>:
+10100bac <TIMER2_IrqHandler>:
 
 	return 0;
 }
 
 void TIMER2_IrqHandler(void)
 {
-10100b90:	1151                	addi	sp,sp,-12
-10100b92:	c222                	sw	s0,4(sp)
+10100bac:	1151                	addi	sp,sp,-12
+10100bae:	c222                	sw	s0,4(sp)
     static int timeout = 0;
 
 	TIMERS->INTCLR = TIM_INTCLR_TIM2;
-10100b94:	400107b7          	lui	a5,0x40010
+10100bb0:	400107b7          	lui	a5,0x40010
 {
-10100b98:	c406                	sw	ra,8(sp)
+10100bb4:	c406                	sw	ra,8(sp)
 	TIMERS->INTCLR = TIM_INTCLR_TIM2;
-10100b9a:	4709                	li	a4,2
-10100b9c:	0ae7a423          	sw	a4,168(a5) # 400100a8 <_sp+0x2000f0a8>
+10100bb6:	4709                	li	a4,2
+10100bb8:	0ae7a423          	sw	a4,168(a5) # 400100a8 <_sp+0x2000f0a8>
 	
     if(timeout > BL_TIMEOUT_MS/100)
-10100ba0:	c0c18793          	addi	a5,gp,-1012 # 2000006c <timeout.3873>
-10100ba4:	4394                	lw	a3,0(a5)
-10100ba6:	843e                	mv	s0,a5
-10100ba8:	02d75263          	bge	a4,a3,10100bcc <TIMER2_IrqHandler+0x3c>
+10100bbc:	c0c18793          	addi	a5,gp,-1012 # 2000006c <timeout.3873>
+10100bc0:	4394                	lw	a3,0(a5)
+10100bc2:	843e                	mv	s0,a5
+10100bc4:	02d75263          	bge	a4,a3,10100be8 <TIMER2_IrqHandler+0x3c>
     {
         if(force_enter_bl == 0 && mcuboot_is_connected(&mcuboot) == 0)
-10100bac:	c1418513          	addi	a0,gp,-1004 # 20000074 <mcuboot>
-10100bb0:	ddcff0ef          	jal	ra,1010018c <mcuboot_is_connected>
-10100bb4:	e501                	bnez	a0,10100bbc <TIMER2_IrqHandler+0x2c>
+10100bc8:	c1418513          	addi	a0,gp,-1004 # 20000074 <mcuboot>
+10100bcc:	dc0ff0ef          	jal	ra,1010018c <mcuboot_is_connected>
+10100bd0:	e501                	bnez	a0,10100bd8 <TIMER2_IrqHandler+0x2c>
         {
             timeout_jump = 1;
-10100bb6:	4785                	li	a5,1
-10100bb8:	c0f18823          	sb	a5,-1008(gp) # 20000070 <timeout_jump>
+10100bd2:	4785                	li	a5,1
+10100bd4:	c0f18823          	sb	a5,-1008(gp) # 20000070 <timeout_jump>
         }
 		TIMERS->CON &= ~TIM_CON_IE_TIM2;
-10100bbc:	40010737          	lui	a4,0x40010
-10100bc0:	0a072783          	lw	a5,160(a4) # 400100a0 <_sp+0x2000f0a0>
-10100bc4:	dff7f793          	andi	a5,a5,-513
-10100bc8:	0af72023          	sw	a5,160(a4)
+10100bd8:	40010737          	lui	a4,0x40010
+10100bdc:	0a072783          	lw	a5,160(a4) # 400100a0 <_sp+0x2000f0a0>
+10100be0:	dff7f793          	andi	a5,a5,-513
+10100be4:	0af72023          	sw	a5,160(a4)
     }
     timeout++;
-10100bcc:	401c                	lw	a5,0(s0)
-10100bce:	0785                	addi	a5,a5,1
-10100bd0:	c0f1a623          	sw	a5,-1012(gp) # 2000006c <timeout.3873>
+10100be8:	401c                	lw	a5,0(s0)
+10100bea:	0785                	addi	a5,a5,1
+10100bec:	c0f1a623          	sw	a5,-1012(gp) # 2000006c <timeout.3873>
 	if(timeout == 2 && !mcuboot.is_connected)			// 200ms后切换复用端口检测
-10100bd4:	4709                	li	a4,2
-10100bd6:	02e79063          	bne	a5,a4,10100bf6 <TIMER2_IrqHandler+0x66>
-10100bda:	c1418793          	addi	a5,gp,-1004 # 20000074 <mcuboot>
-10100bde:	0ec7a783          	lw	a5,236(a5)
-10100be2:	eb91                	bnez	a5,10100bf6 <TIMER2_IrqHandler+0x66>
+10100bf0:	4709                	li	a4,2
+10100bf2:	02e79063          	bne	a5,a4,10100c12 <TIMER2_IrqHandler+0x66>
+10100bf6:	c1418793          	addi	a5,gp,-1004 # 20000074 <mcuboot>
+10100bfa:	0ec7a783          	lw	a5,236(a5)
+10100bfe:	eb91                	bnez	a5,10100c12 <TIMER2_IrqHandler+0x66>
 	{
 		IOM->AF0 = 0x00003000;
-10100be4:	400127b7          	lui	a5,0x40012
-10100be8:	670d                	lui	a4,0x3
-10100bea:	40e7ae23          	sw	a4,1052(a5) # 4001241c <_sp+0x2001141c>
+10100c00:	400127b7          	lui	a5,0x40012
+10100c04:	670d                	lui	a4,0x3
+10100c06:	40e7ae23          	sw	a4,1052(a5) # 4001241c <_sp+0x2001141c>
 		IOM->AF1 = 0x00000030;
-10100bee:	03000713          	li	a4,48
-10100bf2:	42e7a023          	sw	a4,1056(a5)
+10100c0a:	03000713          	li	a4,48
+10100c0e:	42e7a023          	sw	a4,1056(a5)
 	}
 }
-10100bf6:	40a2                	lw	ra,8(sp)
-10100bf8:	4412                	lw	s0,4(sp)
-10100bfa:	0131                	addi	sp,sp,12
-10100bfc:	8082                	ret
+10100c12:	40a2                	lw	ra,8(sp)
+10100c14:	4412                	lw	s0,4(sp)
+10100c16:	0131                	addi	sp,sp,12
+10100c18:	8082                	ret
 
-10100bfe <_exit>:
+10100c1a <_exit>:
 	//   write_hex(STDERR_FILENO, code);
 	//   write(STDERR_FILENO, "\n", 1);
 
 	(void)code;
 	for (;;)
 		;
-10100bfe:	a001                	j	10100bfe <_exit>
+10100c1a:	a001                	j	10100c1a <_exit>
 
-10100c00 <trap_entry>:
+10100c1c <trap_entry>:
 
   .section      .text.entry
   .align 2
   .global trap_entry
 trap_entry:
   TRAP_ENTRY
-10100c00:	7139                	addi	sp,sp,-64
-10100c02:	c006                	sw	ra,0(sp)
-10100c04:	c216                	sw	t0,4(sp)
-10100c06:	c41a                	sw	t1,8(sp)
-10100c08:	c61e                	sw	t2,12(sp)
-10100c0a:	c82a                	sw	a0,16(sp)
-10100c0c:	ca2e                	sw	a1,20(sp)
-10100c0e:	cc32                	sw	a2,24(sp)
-10100c10:	ce36                	sw	a3,28(sp)
-10100c12:	d03a                	sw	a4,32(sp)
-10100c14:	d23e                	sw	a5,36(sp)
+10100c1c:	7139                	addi	sp,sp,-64
+10100c1e:	c006                	sw	ra,0(sp)
+10100c20:	c216                	sw	t0,4(sp)
+10100c22:	c41a                	sw	t1,8(sp)
+10100c24:	c61e                	sw	t2,12(sp)
+10100c26:	c82a                	sw	a0,16(sp)
+10100c28:	ca2e                	sw	a1,20(sp)
+10100c2a:	cc32                	sw	a2,24(sp)
+10100c2c:	ce36                	sw	a3,28(sp)
+10100c2e:	d03a                	sw	a4,32(sp)
+10100c30:	d23e                	sw	a5,36(sp)
 
   csrr a0, mcause
-10100c16:	34202573          	csrr	a0,mcause
+10100c32:	34202573          	csrr	a0,mcause
   csrr a1, mepc
-10100c1a:	341025f3          	csrr	a1,mepc
+10100c36:	341025f3          	csrr	a1,mepc
   call handle_trap
-10100c1e:	200d                	jal	10100c40 <handle_trap>
+10100c3a:	200d                	jal	10100c5c <handle_trap>
 
 
   csrw mepc, a0
-10100c20:	34151073          	csrw	mepc,a0
+10100c3c:	34151073          	csrw	mepc,a0
   TRAP_EXIT
-10100c24:	4082                	lw	ra,0(sp)
-10100c26:	4292                	lw	t0,4(sp)
-10100c28:	4322                	lw	t1,8(sp)
-10100c2a:	43b2                	lw	t2,12(sp)
-10100c2c:	4542                	lw	a0,16(sp)
-10100c2e:	45d2                	lw	a1,20(sp)
-10100c30:	4662                	lw	a2,24(sp)
-10100c32:	46f2                	lw	a3,28(sp)
-10100c34:	5702                	lw	a4,32(sp)
-10100c36:	5792                	lw	a5,36(sp)
-10100c38:	6121                	addi	sp,sp,64
-10100c3a:	30200073          	mret
+10100c40:	4082                	lw	ra,0(sp)
+10100c42:	4292                	lw	t0,4(sp)
+10100c44:	4322                	lw	t1,8(sp)
+10100c46:	43b2                	lw	t2,12(sp)
+10100c48:	4542                	lw	a0,16(sp)
+10100c4a:	45d2                	lw	a1,20(sp)
+10100c4c:	4662                	lw	a2,24(sp)
+10100c4e:	46f2                	lw	a3,28(sp)
+10100c50:	5702                	lw	a4,32(sp)
+10100c52:	5792                	lw	a5,36(sp)
+10100c54:	6121                	addi	sp,sp,64
+10100c56:	30200073          	mret
 
 
 .weak handle_trap
 handle_trap:
 1:
   j 1b
-10100c3e:	a001                	j	10100c3e <trap_entry+0x3e>
+10100c5a:	a001                	j	10100c5a <trap_entry+0x3e>
 
-10100c40 <handle_trap>:
+10100c5c <handle_trap>:
   * @retval None
   */
 unsigned int handle_trap(unsigned int mcause, unsigned int epc)
 {
 	/* External Machine-Level interrupt from PLIC */
 	if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == EXP_M_EXT_INT) && (PLIC_GetCLAIM() == TIMER2_IRQn))
-10100c40:	02055e63          	bgez	a0,10100c7c <handle_trap+0x3c>
-10100c44:	00151793          	slli	a5,a0,0x1
-10100c48:	8385                	srli	a5,a5,0x1
-10100c4a:	472d                	li	a4,11
-10100c4c:	02e79863          	bne	a5,a4,10100c7c <handle_trap+0x3c>
+10100c5c:	02055e63          	bgez	a0,10100c98 <handle_trap+0x3c>
+10100c60:	00151793          	slli	a5,a0,0x1
+10100c64:	8385                	srli	a5,a5,0x1
+10100c66:	472d                	li	a4,11
+10100c68:	02e79863          	bne	a5,a4,10100c98 <handle_trap+0x3c>
 {
-10100c50:	1141                	addi	sp,sp,-16
-10100c52:	c422                	sw	s0,8(sp)
+10100c6c:	1141                	addi	sp,sp,-16
+10100c6e:	c422                	sw	s0,8(sp)
 	if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == EXP_M_EXT_INT) && (PLIC_GetCLAIM() == TIMER2_IRQn))
-10100c54:	e0010437          	lui	s0,0xe0010
+10100c70:	e0010437          	lui	s0,0xe0010
 {
-10100c58:	c226                	sw	s1,4(sp)
+10100c74:	c226                	sw	s1,4(sp)
 	if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == EXP_M_EXT_INT) && (PLIC_GetCLAIM() == TIMER2_IRQn))
-10100c5a:	30442483          	lw	s1,772(s0) # e0010304 <_sp+0xc000f304>
+10100c76:	30442483          	lw	s1,772(s0) # e0010304 <_sp+0xc000f304>
 {
-10100c5e:	c606                	sw	ra,12(sp)
+10100c7a:	c606                	sw	ra,12(sp)
 	if ((mcause & MCAUSE_INT) && ((mcause & MCAUSE_CAUSE) == EXP_M_EXT_INT) && (PLIC_GetCLAIM() == TIMER2_IRQn))
-10100c60:	4791                	li	a5,4
-10100c62:	00f49763          	bne	s1,a5,10100c70 <handle_trap+0x30>
-10100c66:	c02e                	sw	a1,0(sp)
+10100c7c:	4791                	li	a5,4
+10100c7e:	00f49763          	bne	s1,a5,10100c8c <handle_trap+0x30>
+10100c82:	c02e                	sw	a1,0(sp)
 	{
 		/* Handle the corresponding interrupt */
 		TIMER2_IrqHandler();
-10100c68:	3725                	jal	10100b90 <TIMER2_IrqHandler>
+10100c84:	3725                	jal	10100bac <TIMER2_IrqHandler>
 		
 		/* Clear interrupt source */
 		PLIC_SetCLAIM(TIMER2_IRQn);
-10100c6a:	4582                	lw	a1,0(sp)
-10100c6c:	30942223          	sw	s1,772(s0)
+10100c86:	4582                	lw	a1,0(sp)
+10100c88:	30942223          	sw	s1,772(s0)
 	}
 
 	/* Returns the return address of the exception */
 	return epc;
 }
-10100c70:	40b2                	lw	ra,12(sp)
-10100c72:	4422                	lw	s0,8(sp)
-10100c74:	4492                	lw	s1,4(sp)
-10100c76:	852e                	mv	a0,a1
-10100c78:	0141                	addi	sp,sp,16
-10100c7a:	8082                	ret
-10100c7c:	852e                	mv	a0,a1
-10100c7e:	8082                	ret
+10100c8c:	40b2                	lw	ra,12(sp)
+10100c8e:	4422                	lw	s0,8(sp)
+10100c90:	4492                	lw	s1,4(sp)
+10100c92:	852e                	mv	a0,a1
+10100c94:	0141                	addi	sp,sp,16
+10100c96:	8082                	ret
+10100c98:	852e                	mv	a0,a1
+10100c9a:	8082                	ret
 
-10100c80 <SystemInit>:
-	SYSC->WRPROCFG	= SYSC_WRPROCFG_V0;
-	SYSC->WRPROCFG	= SYSC_WRPROCFG_V1;
-	SYSC->CLKCTRCFG = tmpreg;
-#else
-	/* Turn on ANAC clocks */
-	SYSC->CLKENCFG |= SYSC_CLKENCFG_ANAC;
-10100c80:	40001737          	lui	a4,0x40001
-10100c84:	471c                	lw	a5,8(a4)
-10100c86:	6685                	lui	a3,0x1
+10100c9c <SystemInit>:
+  * @retval None
+  */
+void SystemInit(void)
+{
+	// 打开模块时钟门控
+	SYSC->CLKENCFG = 0x00005cf9;
+10100c9c:	6799                	lui	a5,0x6
+10100c9e:	400016b7          	lui	a3,0x40001
+10100ca2:	cf978713          	addi	a4,a5,-775 # 5cf9 <__stack_size+0x58f9>
+10100ca6:	c698                	sw	a4,8(a3)
 
-	/* Enable main frequency oscillator HRC */
+	// 时钟源配置
 	ANAC->WPROT = ANAC_WPROT_V0;
-10100c88:	6599                	lui	a1,0x6
-	SYSC->CLKENCFG |= SYSC_CLKENCFG_ANAC;
-10100c8a:	8fd5                	or	a5,a5,a3
-10100c8c:	c71c                	sw	a5,8(a4)
-	ANAC->WPROT = ANAC_WPROT_V0;
-10100c8e:	a5a58593          	addi	a1,a1,-1446 # 5a5a <__stack_size+0x565a>
-10100c92:	400127b7          	lui	a5,0x40012
+10100ca8:	a5a78793          	addi	a5,a5,-1446
+10100cac:	40012737          	lui	a4,0x40012
 	ANAC->WPROT = ANAC_WPROT_V1;
-10100c96:	6629                	lui	a2,0xa
+10100cb0:	6629                	lui	a2,0xa
 	ANAC->WPROT = ANAC_WPROT_V0;
-10100c98:	c2b7ae23          	sw	a1,-964(a5) # 40011c3c <_sp+0x20010c3c>
+10100cb2:	c2f72e23          	sw	a5,-964(a4) # 40011c3c <_sp+0x20010c3c>
 	ANAC->WPROT = ANAC_WPROT_V1;
-10100c9c:	5a560613          	addi	a2,a2,1445 # a5a5 <__stack_size+0xa1a5>
-10100ca0:	c2c7ae23          	sw	a2,-964(a5)
-	ANAC->CLK_CFG |= ANAC_CLK_CFG_HRC_EN;
-10100ca4:	c207a503          	lw	a0,-992(a5)
-10100ca8:	00256513          	ori	a0,a0,2
-10100cac:	c2a7a023          	sw	a0,-992(a5)
+10100cb6:	5a560613          	addi	a2,a2,1445 # a5a5 <__stack_size+0xa1a5>
+10100cba:	c2c72e23          	sw	a2,-964(a4)
+	ANAC->CLK_CFG = 0x00000013;
+10100cbe:	45cd                	li	a1,19
+10100cc0:	c2b72023          	sw	a1,-992(a4)
 
-	/* Calculate high-speed crystal oscillator frequency gear */
-	tmpreg = ANAC->CLK_CFG;
-10100cb0:	c207a503          	lw	a0,-992(a5)
-	tmpreg &= ~ANAC_CLK_CFG_HRC_FSEL;
-	tmpreg |= SYSC_CLK_SRC_SEL << ANAC_CLK_CFG_HRC_FSEL_pos;
-
-	/* The high-speed crystal oscillator frequency gear value is written into the register */
-	ANAC->WPROT	  = ANAC_WPROT_V0;
-10100cb4:	c2b7ae23          	sw	a1,-964(a5)
-	ANAC->WPROT	  = ANAC_WPROT_V1;
-10100cb8:	c2c7ae23          	sw	a2,-964(a5)
-	tmpreg &= ~ANAC_CLK_CFG_HRC_FSEL;
-10100cbc:	990d                	andi	a0,a0,-29
-	tmpreg |= SYSC_CLK_SRC_SEL << ANAC_CLK_CFG_HRC_FSEL_pos;
-10100cbe:	01056513          	ori	a0,a0,16
-	ANAC->CLK_CFG = tmpreg;
-10100cc2:	c2a7a023          	sw	a0,-992(a5)
-
-	/* Calculate and configure the system clock source and bus divider value */
-	tmpreg = SYSC->CLKCTRCFG;
-10100cc6:	431c                	lw	a5,0(a4)
-	tmpreg &= ~(SYSC_CLKCTRCFG_APB_CLK_DIV | SYSC_CLKCTRCFG_AHB_CLK_DIV | SYSC_CLKCTRCFG_SYS_CLK_SEL);
-10100cc8:	ff808537          	lui	a0,0xff808
-	tmpreg |= ((SYSC_AHB_DIV << SYSC_CLKCTRCFG_AHB_CLK_DIV_pos) | (SYSC_APB_DIV << SYSC_CLKCTRCFG_APB_CLK_DIV_pos) |
-			   SYSC_CLKCTRCFG_SYS_CLK_SEL_HRC);
-
-	/* The system clock source and bus divider value are written to the register */
+	// 系统时钟配置
 	SYSC->WRPROCFG	= SYSC_WRPROCFG_V0;
-10100ccc:	c34c                	sw	a1,4(a4)
-	tmpreg &= ~(SYSC_CLKCTRCFG_APB_CLK_DIV | SYSC_CLKCTRCFG_AHB_CLK_DIV | SYSC_CLKCTRCFG_SYS_CLK_SEL);
-10100cce:	0fe50513          	addi	a0,a0,254 # ff8080fe <_sp+0xdf8070fe>
-10100cd2:	8fe9                	and	a5,a5,a0
+10100cc4:	c2dc                	sw	a5,4(a3)
 	SYSC->WRPROCFG	= SYSC_WRPROCFG_V1;
-10100cd4:	c350                	sw	a2,4(a4)
-	SYSC->CLKCTRCFG = tmpreg;
-10100cd6:	c31c                	sw	a5,0(a4)
+10100cc6:	c2d0                	sw	a2,4(a3)
+	SYSC->CLKCTRCFG = 0x00000000;
+10100cc8:	0006a023          	sw	zero,0(a3) # 40001000 <_sp+0x20000000>
 	UART_Init(UART1, &UART_InitStructure);
 #endif
 #endif
 
 	/* Configure exception entry address */
 	WRITE_CSR(mtvec, &trap_entry);
-10100cd8:	00000797          	auipc	a5,0x0
-10100cdc:	f2878793          	addi	a5,a5,-216 # 10100c00 <trap_entry>
-10100ce0:	30579073          	csrw	mtvec,a5
+10100ccc:	00000797          	auipc	a5,0x0
+10100cd0:	f5078793          	addi	a5,a5,-176 # 10100c1c <trap_entry>
+10100cd4:	30579073          	csrw	mtvec,a5
 
 	/* Enable global interrupt */
 	EnableGlobleIRQ();
-10100ce4:	300467f3          	csrrsi	a5,mstatus,8
+10100cd8:	300467f3          	csrrsi	a5,mstatus,8
 
 	/* Enable external interrupt */
 	EnableExtIRQ();
-10100ce8:	80068693          	addi	a3,a3,-2048 # 800 <__stack_size+0x400>
-10100cec:	3046a6f3          	csrrs	a3,mie,a3
+10100cdc:	6785                	lui	a5,0x1
+10100cde:	80078793          	addi	a5,a5,-2048 # 800 <__stack_size+0x400>
+10100ce2:	3047a7f3          	csrrs	a5,mie,a5
 }
-10100cf0:	8082                	ret
+10100ce6:	8082                	ret
 
-10100cf2 <EFC_GetEFCStatus>:
+10100ce8 <EFC_GetEFCStatus>:
   */
 EFC_Status EFC_GetEFCStatus(void)
 {
 	EFC_Status status = EFC_SUCCESS;
 
 	if (!(EFC->STS))
-10100cf2:	400007b7          	lui	a5,0x40000
-10100cf6:	53d8                	lw	a4,36(a5)
+10100ce8:	400007b7          	lui	a5,0x40000
+10100cec:	53d8                	lw	a4,36(a5)
 	{
 		/* No status flag to generate EFC exception */
 		status = EFC_FAIL;
-10100cf8:	4505                	li	a0,1
+10100cee:	4505                	li	a0,1
 	if (!(EFC->STS))
-10100cfa:	c711                	beqz	a4,10100d06 <EFC_GetEFCStatus+0x14>
+10100cf0:	c711                	beqz	a4,10100cfc <EFC_GetEFCStatus+0x14>
 	}
 	else if (EFC->STS & (~EFC_STS_CD))
-10100cfc:	53c8                	lw	a0,36(a5)
-10100cfe:	9979                	andi	a0,a0,-2
+10100cf2:	53c8                	lw	a0,36(a5)
+10100cf4:	9979                	andi	a0,a0,-2
 		status = EFC_ERROR;
 	}
 	else
 	{
 		/* Operation completed normally */
 		status = EFC_SUCCESS;
-10100d00:	00153513          	seqz	a0,a0
-10100d04:	0506                	slli	a0,a0,0x1
+10100cf6:	00153513          	seqz	a0,a0
+10100cfa:	0506                	slli	a0,a0,0x1
 	}
 
 	/* Return the EFC Status */
 	return status;
 }
-10100d06:	8082                	ret
+10100cfc:	8082                	ret
 
-10100d08 <EFC_SingleProgram>:
+10100cfe <EFC_SingleProgram>:
 	/* Check the parameters */
 	PARAM_CHECK(IS_EFC_MEM_ADDR(Addr));
 	PARAM_CHECK(IS_EFC_PRG_TYPE(PrgType));
 
 	/* Clear EFC Status Register */
 	tempreg	 = EFC->STS;
-10100d08:	400007b7          	lui	a5,0x40000
-10100d0c:	53d8                	lw	a4,36(a5)
+10100cfe:	400007b7          	lui	a5,0x40000
+10100d02:	53d8                	lw	a4,36(a5)
 	EFC->STS = tempreg;
-10100d0e:	d3d8                	sw	a4,36(a5)
+10100d04:	d3d8                	sw	a4,36(a5)
 
 	/* The OPR register of the EFC performs a single-address programming operation */
 	EFC_OPR_OPEN(EFC_OPR_OPRMODE_SIG_PRG);
-10100d10:	0007ae23          	sw	zero,28(a5) # 4000001c <_sp+0x1ffff01c>
-10100d14:	07000713          	li	a4,112
-10100d18:	cfd8                	sw	a4,28(a5)
-10100d1a:	09000713          	li	a4,144
-10100d1e:	cfd8                	sw	a4,28(a5)
-10100d20:	0c000713          	li	a4,192
-10100d24:	cfd8                	sw	a4,28(a5)
+10100d06:	0007ae23          	sw	zero,28(a5) # 4000001c <_sp+0x1ffff01c>
+10100d0a:	07000713          	li	a4,112
+10100d0e:	cfd8                	sw	a4,28(a5)
+10100d10:	09000713          	li	a4,144
+10100d14:	cfd8                	sw	a4,28(a5)
+10100d16:	0c000713          	li	a4,192
+10100d1a:	cfd8                	sw	a4,28(a5)
 
 	/* Write data to the corresponding address */
 	if (PrgType == EFC_PRG_BYTE)
-10100d26:	e611                	bnez	a2,10100d32 <EFC_SingleProgram+0x2a>
+10100d1c:	e611                	bnez	a2,10100d28 <EFC_SingleProgram+0x2a>
 	{
 		/* byte programming */
 		REG8(Addr) = Data;
-10100d28:	0ff5f593          	andi	a1,a1,255
-10100d2c:	00b50023          	sb	a1,0(a0)
+10100d1e:	0ff5f593          	andi	a1,a1,255
+10100d22:	00b50023          	sb	a1,0(a0)
 		PARAM_CHECK(IS_WORD_ADDR(Addr));
 		REG32(Addr) = Data;
 	}
 
 	/* Check for the EFC Status */
 	status = EFC_GetEFCStatus();
-10100d30:	b7c9                	j	10100cf2 <EFC_GetEFCStatus>
+10100d26:	b7c9                	j	10100ce8 <EFC_GetEFCStatus>
 	else if (PrgType == EFC_PRG_HWORD)
-10100d32:	4785                	li	a5,1
-10100d34:	00f61763          	bne	a2,a5,10100d42 <EFC_SingleProgram+0x3a>
+10100d28:	4785                	li	a5,1
+10100d2a:	00f61763          	bne	a2,a5,10100d38 <EFC_SingleProgram+0x3a>
 		REG16(Addr) = Data;
-10100d38:	05c2                	slli	a1,a1,0x10
-10100d3a:	81c1                	srli	a1,a1,0x10
-10100d3c:	00b51023          	sh	a1,0(a0)
-10100d40:	bfc5                	j	10100d30 <EFC_SingleProgram+0x28>
+10100d2e:	05c2                	slli	a1,a1,0x10
+10100d30:	81c1                	srli	a1,a1,0x10
+10100d32:	00b51023          	sh	a1,0(a0)
+10100d36:	bfc5                	j	10100d26 <EFC_SingleProgram+0x28>
 		REG32(Addr) = Data;
-10100d42:	c10c                	sw	a1,0(a0)
-10100d44:	b7f5                	j	10100d30 <EFC_SingleProgram+0x28>
+10100d38:	c10c                	sw	a1,0(a0)
+10100d3a:	b7f5                	j	10100d26 <EFC_SingleProgram+0x28>
 
-10100d46 <EFC_PageErase>:
+10100d3c <EFC_PageErase>:
 
 	/* Check the parameters */
 	PARAM_CHECK(IS_EFC_MEM_ADDR(Addr));
 
 	/* Clear EFC Status Register */
 	tempreg	 = EFC->STS;
-10100d46:	400007b7          	lui	a5,0x40000
-10100d4a:	53d8                	lw	a4,36(a5)
+10100d3c:	400007b7          	lui	a5,0x40000
+10100d40:	53d8                	lw	a4,36(a5)
 	EFC->STS = tempreg;
-10100d4c:	d3d8                	sw	a4,36(a5)
+10100d42:	d3d8                	sw	a4,36(a5)
 
 	/* The OPR register of the EFC performs the page erase operation */
 	EFC_OPR_OPEN(EFC_OPR_OPRMODE_PAGE_ERASE);
-10100d4e:	4709                	li	a4,2
-10100d50:	cfd8                	sw	a4,28(a5)
-10100d52:	07200713          	li	a4,114
-10100d56:	cfd8                	sw	a4,28(a5)
-10100d58:	09200713          	li	a4,146
-10100d5c:	cfd8                	sw	a4,28(a5)
-10100d5e:	0c200713          	li	a4,194
-10100d62:	cfd8                	sw	a4,28(a5)
+10100d44:	4709                	li	a4,2
+10100d46:	cfd8                	sw	a4,28(a5)
+10100d48:	07200713          	li	a4,114
+10100d4c:	cfd8                	sw	a4,28(a5)
+10100d4e:	09200713          	li	a4,146
+10100d52:	cfd8                	sw	a4,28(a5)
+10100d54:	0c200713          	li	a4,194
+10100d58:	cfd8                	sw	a4,28(a5)
 
 	/* Write any value to the corresponding address */
 	REG8(Addr) = 0xFF;
-10100d64:	57fd                	li	a5,-1
-10100d66:	00f50023          	sb	a5,0(a0)
+10100d5a:	57fd                	li	a5,-1
+10100d5c:	00f50023          	sb	a5,0(a0)
 
 	/* Check for the EFC Status */
 	status = EFC_GetEFCStatus();
-10100d6a:	b761                	j	10100cf2 <EFC_GetEFCStatus>
+10100d60:	b761                	j	10100ce8 <EFC_GetEFCStatus>
 
-10100d6c <exit>:
-10100d6c:	1151                	addi	sp,sp,-12
-10100d6e:	c222                	sw	s0,4(sp)
-10100d70:	c406                	sw	ra,8(sp)
-10100d72:	efeff797          	auipc	a5,0xefeff
-10100d76:	28e78793          	addi	a5,a5,654 # 0 <__stack_size-0x400>
-10100d7a:	842a                	mv	s0,a0
-10100d7c:	c791                	beqz	a5,10100d88 <exit+0x1c>
-10100d7e:	4581                	li	a1,0
-10100d80:	00000097          	auipc	ra,0x0
-10100d84:	000000e7          	jalr	zero # 0 <__stack_size-0x400>
-10100d88:	00000797          	auipc	a5,0x0
-10100d8c:	1fc78793          	addi	a5,a5,508 # 10100f84 <_global_impure_ptr>
-10100d90:	4388                	lw	a0,0(a5)
-10100d92:	551c                	lw	a5,40(a0)
-10100d94:	c391                	beqz	a5,10100d98 <exit+0x2c>
-10100d96:	9782                	jalr	a5
-10100d98:	8522                	mv	a0,s0
-10100d9a:	3595                	jal	10100bfe <_exit>
+10100d62 <exit>:
+10100d62:	1151                	addi	sp,sp,-12
+10100d64:	c222                	sw	s0,4(sp)
+10100d66:	c406                	sw	ra,8(sp)
+10100d68:	efeff797          	auipc	a5,0xefeff
+10100d6c:	29878793          	addi	a5,a5,664 # 0 <__stack_size-0x400>
+10100d70:	842a                	mv	s0,a0
+10100d72:	c791                	beqz	a5,10100d7e <exit+0x1c>
+10100d74:	4581                	li	a1,0
+10100d76:	00000097          	auipc	ra,0x0
+10100d7a:	000000e7          	jalr	zero # 0 <__stack_size-0x400>
+10100d7e:	00000797          	auipc	a5,0x0
+10100d82:	1fe78793          	addi	a5,a5,510 # 10100f7c <_global_impure_ptr>
+10100d86:	4388                	lw	a0,0(a5)
+10100d88:	551c                	lw	a5,40(a0)
+10100d8a:	c391                	beqz	a5,10100d8e <exit+0x2c>
+10100d8c:	9782                	jalr	a5
+10100d8e:	8522                	mv	a0,s0
+10100d90:	3569                	jal	10100c1a <_exit>
 
-10100d9c <memcpy>:
-10100d9c:	00a5c7b3          	xor	a5,a1,a0
-10100da0:	8b8d                	andi	a5,a5,3
-10100da2:	00c50733          	add	a4,a0,a2
-10100da6:	e781                	bnez	a5,10100dae <memcpy+0x12>
-10100da8:	478d                	li	a5,3
-10100daa:	02c7e963          	bltu	a5,a2,10100ddc <memcpy+0x40>
-10100dae:	87aa                	mv	a5,a0
-10100db0:	0ce57163          	bgeu	a0,a4,10100e72 <memcpy+0xd6>
-10100db4:	0005c683          	lbu	a3,0(a1)
-10100db8:	0785                	addi	a5,a5,1
-10100dba:	0585                	addi	a1,a1,1
-10100dbc:	fed78fa3          	sb	a3,-1(a5)
-10100dc0:	fee7eae3          	bltu	a5,a4,10100db4 <memcpy+0x18>
-10100dc4:	8082                	ret
-10100dc6:	0005c683          	lbu	a3,0(a1)
-10100dca:	0785                	addi	a5,a5,1
-10100dcc:	0585                	addi	a1,a1,1
-10100dce:	fed78fa3          	sb	a3,-1(a5)
-10100dd2:	fee7eae3          	bltu	a5,a4,10100dc6 <memcpy+0x2a>
-10100dd6:	4402                	lw	s0,0(sp)
-10100dd8:	0111                	addi	sp,sp,4
-10100dda:	8082                	ret
-10100ddc:	00357693          	andi	a3,a0,3
-10100de0:	87aa                	mv	a5,a0
-10100de2:	ca91                	beqz	a3,10100df6 <memcpy+0x5a>
-10100de4:	0005c683          	lbu	a3,0(a1)
-10100de8:	0785                	addi	a5,a5,1
-10100dea:	0585                	addi	a1,a1,1
-10100dec:	fed78fa3          	sb	a3,-1(a5)
-10100df0:	0037f693          	andi	a3,a5,3
-10100df4:	b7fd                	j	10100de2 <memcpy+0x46>
-10100df6:	ffc77693          	andi	a3,a4,-4
-10100dfa:	fe068613          	addi	a2,a3,-32
-10100dfe:	06c7f563          	bgeu	a5,a2,10100e68 <memcpy+0xcc>
-10100e02:	1171                	addi	sp,sp,-4
-10100e04:	c022                	sw	s0,0(sp)
-10100e06:	49c0                	lw	s0,20(a1)
-10100e08:	0005a303          	lw	t1,0(a1)
-10100e0c:	0085a383          	lw	t2,8(a1)
-10100e10:	cbc0                	sw	s0,20(a5)
-10100e12:	4d80                	lw	s0,24(a1)
-10100e14:	0067a023          	sw	t1,0(a5)
-10100e18:	0045a303          	lw	t1,4(a1)
-10100e1c:	cf80                	sw	s0,24(a5)
-10100e1e:	4dc0                	lw	s0,28(a1)
-10100e20:	0067a223          	sw	t1,4(a5)
-10100e24:	00c5a283          	lw	t0,12(a1)
-10100e28:	0105a303          	lw	t1,16(a1)
-10100e2c:	02458593          	addi	a1,a1,36
-10100e30:	cfc0                	sw	s0,28(a5)
-10100e32:	ffc5a403          	lw	s0,-4(a1)
-10100e36:	0077a423          	sw	t2,8(a5)
-10100e3a:	0057a623          	sw	t0,12(a5)
-10100e3e:	0067a823          	sw	t1,16(a5)
-10100e42:	02478793          	addi	a5,a5,36
-10100e46:	fe87ae23          	sw	s0,-4(a5)
-10100e4a:	fac7eee3          	bltu	a5,a2,10100e06 <memcpy+0x6a>
-10100e4e:	f8d7f2e3          	bgeu	a5,a3,10100dd2 <memcpy+0x36>
-10100e52:	4190                	lw	a2,0(a1)
-10100e54:	0791                	addi	a5,a5,4
-10100e56:	0591                	addi	a1,a1,4
-10100e58:	fec7ae23          	sw	a2,-4(a5)
-10100e5c:	bfcd                	j	10100e4e <memcpy+0xb2>
-10100e5e:	4190                	lw	a2,0(a1)
-10100e60:	0791                	addi	a5,a5,4
-10100e62:	0591                	addi	a1,a1,4
-10100e64:	fec7ae23          	sw	a2,-4(a5)
-10100e68:	fed7ebe3          	bltu	a5,a3,10100e5e <memcpy+0xc2>
-10100e6c:	f4e7e4e3          	bltu	a5,a4,10100db4 <memcpy+0x18>
-10100e70:	8082                	ret
-10100e72:	8082                	ret
+10100d92 <memcpy>:
+10100d92:	00a5c7b3          	xor	a5,a1,a0
+10100d96:	8b8d                	andi	a5,a5,3
+10100d98:	00c50733          	add	a4,a0,a2
+10100d9c:	e781                	bnez	a5,10100da4 <memcpy+0x12>
+10100d9e:	478d                	li	a5,3
+10100da0:	02c7e963          	bltu	a5,a2,10100dd2 <memcpy+0x40>
+10100da4:	87aa                	mv	a5,a0
+10100da6:	0ce57163          	bgeu	a0,a4,10100e68 <memcpy+0xd6>
+10100daa:	0005c683          	lbu	a3,0(a1)
+10100dae:	0785                	addi	a5,a5,1
+10100db0:	0585                	addi	a1,a1,1
+10100db2:	fed78fa3          	sb	a3,-1(a5)
+10100db6:	fee7eae3          	bltu	a5,a4,10100daa <memcpy+0x18>
+10100dba:	8082                	ret
+10100dbc:	0005c683          	lbu	a3,0(a1)
+10100dc0:	0785                	addi	a5,a5,1
+10100dc2:	0585                	addi	a1,a1,1
+10100dc4:	fed78fa3          	sb	a3,-1(a5)
+10100dc8:	fee7eae3          	bltu	a5,a4,10100dbc <memcpy+0x2a>
+10100dcc:	4402                	lw	s0,0(sp)
+10100dce:	0111                	addi	sp,sp,4
+10100dd0:	8082                	ret
+10100dd2:	00357693          	andi	a3,a0,3
+10100dd6:	87aa                	mv	a5,a0
+10100dd8:	ca91                	beqz	a3,10100dec <memcpy+0x5a>
+10100dda:	0005c683          	lbu	a3,0(a1)
+10100dde:	0785                	addi	a5,a5,1
+10100de0:	0585                	addi	a1,a1,1
+10100de2:	fed78fa3          	sb	a3,-1(a5)
+10100de6:	0037f693          	andi	a3,a5,3
+10100dea:	b7fd                	j	10100dd8 <memcpy+0x46>
+10100dec:	ffc77693          	andi	a3,a4,-4
+10100df0:	fe068613          	addi	a2,a3,-32
+10100df4:	06c7f563          	bgeu	a5,a2,10100e5e <memcpy+0xcc>
+10100df8:	1171                	addi	sp,sp,-4
+10100dfa:	c022                	sw	s0,0(sp)
+10100dfc:	49c0                	lw	s0,20(a1)
+10100dfe:	0005a303          	lw	t1,0(a1)
+10100e02:	0085a383          	lw	t2,8(a1)
+10100e06:	cbc0                	sw	s0,20(a5)
+10100e08:	4d80                	lw	s0,24(a1)
+10100e0a:	0067a023          	sw	t1,0(a5)
+10100e0e:	0045a303          	lw	t1,4(a1)
+10100e12:	cf80                	sw	s0,24(a5)
+10100e14:	4dc0                	lw	s0,28(a1)
+10100e16:	0067a223          	sw	t1,4(a5)
+10100e1a:	00c5a283          	lw	t0,12(a1)
+10100e1e:	0105a303          	lw	t1,16(a1)
+10100e22:	02458593          	addi	a1,a1,36
+10100e26:	cfc0                	sw	s0,28(a5)
+10100e28:	ffc5a403          	lw	s0,-4(a1)
+10100e2c:	0077a423          	sw	t2,8(a5)
+10100e30:	0057a623          	sw	t0,12(a5)
+10100e34:	0067a823          	sw	t1,16(a5)
+10100e38:	02478793          	addi	a5,a5,36
+10100e3c:	fe87ae23          	sw	s0,-4(a5)
+10100e40:	fac7eee3          	bltu	a5,a2,10100dfc <memcpy+0x6a>
+10100e44:	f8d7f2e3          	bgeu	a5,a3,10100dc8 <memcpy+0x36>
+10100e48:	4190                	lw	a2,0(a1)
+10100e4a:	0791                	addi	a5,a5,4
+10100e4c:	0591                	addi	a1,a1,4
+10100e4e:	fec7ae23          	sw	a2,-4(a5)
+10100e52:	bfcd                	j	10100e44 <memcpy+0xb2>
+10100e54:	4190                	lw	a2,0(a1)
+10100e56:	0791                	addi	a5,a5,4
+10100e58:	0591                	addi	a1,a1,4
+10100e5a:	fec7ae23          	sw	a2,-4(a5)
+10100e5e:	fed7ebe3          	bltu	a5,a3,10100e54 <memcpy+0xc2>
+10100e62:	f4e7e4e3          	bltu	a5,a4,10100daa <memcpy+0x18>
+10100e66:	8082                	ret
+10100e68:	8082                	ret
 
-10100e74 <memset>:
-10100e74:	433d                	li	t1,15
-10100e76:	872a                	mv	a4,a0
-10100e78:	02c37363          	bgeu	t1,a2,10100e9e <memset+0x2a>
-10100e7c:	00f77793          	andi	a5,a4,15
-10100e80:	efbd                	bnez	a5,10100efe <memset+0x8a>
-10100e82:	e5ad                	bnez	a1,10100eec <memset+0x78>
-10100e84:	ff067693          	andi	a3,a2,-16
-10100e88:	8a3d                	andi	a2,a2,15
-10100e8a:	96ba                	add	a3,a3,a4
-10100e8c:	c30c                	sw	a1,0(a4)
-10100e8e:	c34c                	sw	a1,4(a4)
-10100e90:	c70c                	sw	a1,8(a4)
-10100e92:	c74c                	sw	a1,12(a4)
-10100e94:	0741                	addi	a4,a4,16
-10100e96:	fed76be3          	bltu	a4,a3,10100e8c <memset+0x18>
-10100e9a:	e211                	bnez	a2,10100e9e <memset+0x2a>
-10100e9c:	8082                	ret
-10100e9e:	40c306b3          	sub	a3,t1,a2
-10100ea2:	068a                	slli	a3,a3,0x2
-10100ea4:	00000297          	auipc	t0,0x0
-10100ea8:	9696                	add	a3,a3,t0
-10100eaa:	00a68067          	jr	10(a3)
-10100eae:	00b70723          	sb	a1,14(a4) # 4000100e <_sp+0x2000000e>
-10100eb2:	00b706a3          	sb	a1,13(a4)
-10100eb6:	00b70623          	sb	a1,12(a4)
-10100eba:	00b705a3          	sb	a1,11(a4)
-10100ebe:	00b70523          	sb	a1,10(a4)
-10100ec2:	00b704a3          	sb	a1,9(a4)
-10100ec6:	00b70423          	sb	a1,8(a4)
-10100eca:	00b703a3          	sb	a1,7(a4)
-10100ece:	00b70323          	sb	a1,6(a4)
-10100ed2:	00b702a3          	sb	a1,5(a4)
-10100ed6:	00b70223          	sb	a1,4(a4)
-10100eda:	00b701a3          	sb	a1,3(a4)
-10100ede:	00b70123          	sb	a1,2(a4)
-10100ee2:	00b700a3          	sb	a1,1(a4)
-10100ee6:	00b70023          	sb	a1,0(a4)
-10100eea:	8082                	ret
-10100eec:	0ff5f593          	andi	a1,a1,255
-10100ef0:	00859693          	slli	a3,a1,0x8
-10100ef4:	8dd5                	or	a1,a1,a3
-10100ef6:	01059693          	slli	a3,a1,0x10
-10100efa:	8dd5                	or	a1,a1,a3
-10100efc:	b761                	j	10100e84 <memset+0x10>
-10100efe:	00279693          	slli	a3,a5,0x2
-10100f02:	00000297          	auipc	t0,0x0
-10100f06:	9696                	add	a3,a3,t0
-10100f08:	8286                	mv	t0,ra
-10100f0a:	fa8680e7          	jalr	-88(a3)
-10100f0e:	8096                	mv	ra,t0
-10100f10:	17c1                	addi	a5,a5,-16
-10100f12:	8f1d                	sub	a4,a4,a5
-10100f14:	963e                	add	a2,a2,a5
-10100f16:	f8c374e3          	bgeu	t1,a2,10100e9e <memset+0x2a>
-10100f1a:	b7a5                	j	10100e82 <memset+0xe>
+10100e6a <memset>:
+10100e6a:	433d                	li	t1,15
+10100e6c:	872a                	mv	a4,a0
+10100e6e:	02c37363          	bgeu	t1,a2,10100e94 <memset+0x2a>
+10100e72:	00f77793          	andi	a5,a4,15
+10100e76:	efbd                	bnez	a5,10100ef4 <memset+0x8a>
+10100e78:	e5ad                	bnez	a1,10100ee2 <memset+0x78>
+10100e7a:	ff067693          	andi	a3,a2,-16
+10100e7e:	8a3d                	andi	a2,a2,15
+10100e80:	96ba                	add	a3,a3,a4
+10100e82:	c30c                	sw	a1,0(a4)
+10100e84:	c34c                	sw	a1,4(a4)
+10100e86:	c70c                	sw	a1,8(a4)
+10100e88:	c74c                	sw	a1,12(a4)
+10100e8a:	0741                	addi	a4,a4,16
+10100e8c:	fed76be3          	bltu	a4,a3,10100e82 <memset+0x18>
+10100e90:	e211                	bnez	a2,10100e94 <memset+0x2a>
+10100e92:	8082                	ret
+10100e94:	40c306b3          	sub	a3,t1,a2
+10100e98:	068a                	slli	a3,a3,0x2
+10100e9a:	00000297          	auipc	t0,0x0
+10100e9e:	9696                	add	a3,a3,t0
+10100ea0:	00a68067          	jr	10(a3)
+10100ea4:	00b70723          	sb	a1,14(a4)
+10100ea8:	00b706a3          	sb	a1,13(a4)
+10100eac:	00b70623          	sb	a1,12(a4)
+10100eb0:	00b705a3          	sb	a1,11(a4)
+10100eb4:	00b70523          	sb	a1,10(a4)
+10100eb8:	00b704a3          	sb	a1,9(a4)
+10100ebc:	00b70423          	sb	a1,8(a4)
+10100ec0:	00b703a3          	sb	a1,7(a4)
+10100ec4:	00b70323          	sb	a1,6(a4)
+10100ec8:	00b702a3          	sb	a1,5(a4)
+10100ecc:	00b70223          	sb	a1,4(a4)
+10100ed0:	00b701a3          	sb	a1,3(a4)
+10100ed4:	00b70123          	sb	a1,2(a4)
+10100ed8:	00b700a3          	sb	a1,1(a4)
+10100edc:	00b70023          	sb	a1,0(a4)
+10100ee0:	8082                	ret
+10100ee2:	0ff5f593          	andi	a1,a1,255
+10100ee6:	00859693          	slli	a3,a1,0x8
+10100eea:	8dd5                	or	a1,a1,a3
+10100eec:	01059693          	slli	a3,a1,0x10
+10100ef0:	8dd5                	or	a1,a1,a3
+10100ef2:	b761                	j	10100e7a <memset+0x10>
+10100ef4:	00279693          	slli	a3,a5,0x2
+10100ef8:	00000297          	auipc	t0,0x0
+10100efc:	9696                	add	a3,a3,t0
+10100efe:	8286                	mv	t0,ra
+10100f00:	fa8680e7          	jalr	-88(a3)
+10100f04:	8096                	mv	ra,t0
+10100f06:	17c1                	addi	a5,a5,-16
+10100f08:	8f1d                	sub	a4,a4,a5
+10100f0a:	963e                	add	a2,a2,a5
+10100f0c:	f8c374e3          	bgeu	t1,a2,10100e94 <memset+0x2a>
+10100f10:	b7a5                	j	10100e78 <memset+0xe>
